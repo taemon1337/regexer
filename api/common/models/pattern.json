@@ -1,0 +1,36 @@
+{
+  "name": "pattern",
+  "plural": "patterns",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "string"
+    },
+    "regex_string": {
+      "type": "string",
+      "required": true
+    },
+    "regex_options": {
+      "type": "string",
+      "default": "g"
+    },
+    "should_match": {
+      "type": "string"
+    },
+    "should_not_match": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

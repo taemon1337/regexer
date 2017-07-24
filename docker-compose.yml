@@ -1,0 +1,22 @@
+version: "2"
+services:
+  mongo:
+    image: mongo:latest
+    volumes:
+      - ./data/mongo:/data/db
+  api:
+    build: ./api
+    volumes:
+      - ./api:/api
+    working_dir: /api
+    command: npm start
+    ports:
+      - 3000:3000
+  app:
+    build: ./app
+    volumes:
+      - ./app:/app
+    working_dir: /app
+    command: npm run dev
+    ports:
+      - 8080:8080
