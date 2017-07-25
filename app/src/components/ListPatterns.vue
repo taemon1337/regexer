@@ -1,7 +1,10 @@
 <template>
   <section>
     <div style="margin-bottom:15px;">
-      <strong>Patterns</strong>
+      <strong>
+        Patterns
+        <span v-if="selected.length">({{ selected.length }} selected)</span>
+      </strong>
     </div>
     <article v-for="(pattern, index) in patterns" key="index" class="">
       <div class="media">
@@ -13,7 +16,7 @@
         <div class="media-content">
           <div class="content">
             <p>
-              <strong>{{ pattern.name }}</strong>
+              <strong @click="toggleId(pattern.id)">{{ pattern.name }}</strong>
             </p>
             <p v-if="current_id === pattern.id">
               {{ pattern.description }}
@@ -27,15 +30,20 @@
         </div>
       </div>
       <div v-if="current_id === pattern.id">
-        <div>
-          <strong>Pattern:</strong>
-          <small>{{ pattern.regex_string }} {{ pattern.regex_options }}</small>
-        </div>
-        <div v-if="pattern.should_match">
-          <strong>Examples:</strong>
-          <ul>
-            <li v-for="(ex, index) in pattern.should_match.split('\n')" key="index">{{ ex }}</li>
-          </ul>
+        <div class="media">
+          <div class="media-content" style="overflow:auto;">
+            <dl>
+              <dd><strong>Pattern:</strong></dd>
+              <dt><pre>{{ pattern.regex_string }}</pre></dt>
+              <dd><strong>Examples:</strong></dd>
+              <dt><pre>{{ pattern.testresult }}</pre></dt>
+            </dl>
+          </div>
+          <div class="media-right">
+            <span class="icon" title="Edit Pattern" @click="edit(pattern)">
+              <i class="fa fa-pencil"></i>
+            </span>
+          </div>
         </div>
         <hr>
       </div>
@@ -69,6 +77,9 @@
       },
       isSelected (pattern) {
         return this.selected.indexOf(pattern) !== -1
+      },
+      edit (pattern) {
+        this.$store.dispatch(PatternTypes.edit, pattern)
       }
     },
     created () {

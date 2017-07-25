@@ -18,14 +18,10 @@
       "type": "string",
       "required": true
     },
-    "regex_options": {
-      "type": "string",
-      "default": "g"
-    },
-    "should_match": {
+    "testdata": {
       "type": "string"
     },
-    "should_not_match": {
+    "testresult": {
       "type": "string"
     }
   },

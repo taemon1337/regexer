@@ -1,0 +1,16 @@
+1.2.3.4
+10.20.30.40
+100.200.300.400
+1000.2000.3000.4000
+11.22.33.44
+111.222.333.444
+
+tim@gmail.com
+frank.bar@bar-com.com.giz
+ok@1
+
+123-456-7890
+
+Here is some embedded email@server.com and an ip 1.2.3.5 to test multiple in a single file 1-2-3-4 aa:bb:cc:dd:ee:ff:gg.
+
+Forget the rest.

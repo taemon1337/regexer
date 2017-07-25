@@ -12,18 +12,14 @@
     <br>
     
     <div v-for="(file, index) in selected" key="index" class="box">
-      <div class="media">
-        <div class="media-left"></div>
-        <div class="content">
-          <strong>{{ file.name }}</strong>
-        </div>
-        <div class="media-right"></div>
-      </div>
+      <file-scan :file='file'></file-scan>
     </div>
   </div>
 </template>
 
 <script>
+  import FileScan from '@/components/FileScan'
+
   export default {
     name: 'NewScanForm',
     data () {
@@ -38,6 +34,9 @@
       fileSelected (e) {
         this.selected = e.target.files
       }
+    },
+    components: {
+      FileScan
     }
   }
 </script>
