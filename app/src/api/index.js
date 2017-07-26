@@ -4,7 +4,7 @@ let base = '/api'
 
 let patterns = {
   fetch_static: function (resolve, reject) {
-    axios.get('/static/patterns.json').then(function (resp) {
+    axios.get('./static/patterns.json').then(function (resp) {
       resolve(resp)
     })
     .catch(function (err) {
