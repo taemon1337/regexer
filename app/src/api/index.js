@@ -1,25 +1,20 @@
 import axios from 'axios'
 
+let defaultPatterns = require('@/assets/patterns.json')
 let base = '/api'
 
 let patterns = {
-  fetch_static: function (resolve, reject) {
-    axios.get('./static/patterns.json').then(function (resp) {
-      resolve(resp)
-    })
-    .catch(function (err) {
-      reject(err)
-    })
-  },
   fetch: function () {
     return new Promise(function (resolve, reject) {
       axios.get(base + '/patterns').then(function (resp) {
-        if (resp.data && resp.data.length === 0) {
-          patterns.fetch_static(resolve, reject)
+        if (resp.data && resp.data.length > 0) {
+          resolve(resp)
+        } else {
+          resolve({ data: defaultPatterns })
         }
       })
       .catch(function () {
-        patterns.fetch_static(resolve, reject)
+        resolve({ data: defaultPatterns })
       })
     })
   },

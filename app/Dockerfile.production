@@ -1,4 +1,12 @@
-FROM nginx:alpine
+FROM node:alpine
 
-COPY ./dist /usr/share/nginx/html
-COPY ./etc/nginx /etc/nginx
+RUN npm install --production express request
+
+WORKDIR /app
+
+COPY ./dist /app/web
+COPY ./prod.js /app/run.js
+
+ENV API=http://api:8080 NODE_ENV=production PORT=8080
+
+CMD node run.js
