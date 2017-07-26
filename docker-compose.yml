@@ -10,6 +10,8 @@ services:
       - ./api:/api
     working_dir: /api
     command: npm start
+    depends_on:
+      - mongo
   app:
     build: ./app
     volumes:
