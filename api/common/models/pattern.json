@@ -23,6 +23,12 @@
     },
     "testresult": {
       "type": "string"
+    },
+    "for_each_result": {
+      "type": "string"
+    },
+    "parse_line": {
+      "type": "string"
     }
   },
   "validations": [],

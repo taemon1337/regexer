@@ -1,1 +1,66 @@
-[{"name":"Domain Name","description":"Domain name (without the http(s):// and without any path.","regex_string":"([a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\\.[a-zA-Z]{2,})+)","testdata":"www.google.com\nhttp://dosomething.com/whatever\nhttps://it.sc.it","testresult":"www.google.com\ndosomething.com","id":"5977e633779e8e0011210a58"},{"name":"IPv4 Address","description":"Internet Protocol Version 4 address regular expression.","regex_string":"((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))","testdata":"1.2.3.4\n100.200.300.400\n1.0.0.0\n255.255.255.255\n1.1.1.1\n","testresult":"1.2.3.4\n1.0.0.0\n255.255.255.255\n1.1.1.1","id":"5977e634779e8e0011210a59"},{"name":"MAC Address","description":"A simple MAC address regex in colon separator form","regex_string":"(([A-Fa-f0-9]{2}[:]){5}[A-Fa-f0-9]{2}[,]?)+","testdata":"AA:BB:CC:DD:EE:FF\nA:B:C:D:E:F\nA:B:C:D:E:F:G\nAA:BB:CC:DD:EE:FF:GG","testresult":"AA:BB:CC:DD:EE:FF\nAA:BB:CC:DD:EE:FF","id":"5977e634779e8e0011210a5a"},{"name":"Email Address","description":"Email address regex","regex_string":"([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\\.[a-zA-Z0-9._-]+)","testdata":"test@gmail.com\n1.email.com\n1@@gamil.com\n1@gcom\njon.smith@foo.bar.com","testresult":"test@gmail.com\njon.smith@foo.bar.com","id":"5977e634779e8e0011210a5b"},{"name":"FQDN","description":"Fully qualified domain names including http:// and paths.","regex_string":"(https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*))","testdata":"https://www.google.com/search\nhttp://foo.bar.com/a/path/to/something","testresult":"https://www.google.com/search\nhttp://foo.bar.com/a/path/to/something","id":"5977e634779e8e0011210a5c"},{"name":"Telephone Number","description":"Generic telephone number regex.","regex_string":"([\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6})","testdata":"(123) 456-7890\n123-456-7890\n123.456.7890\n1234567890\n+31636363634\n075-63546725","testresult":"(123) 456-7890\n123-456-7890\n123.456.7890\n1234567890\n+31636363634\n075-63546725","id":"5977e634779e8e0011210a5d"},{"name":"US Telephone Number","description":"Common United States telephone number expression","regex_string":"((\\()?\\d{3}(\\))?(-|\\s)?\\d{3}(-|\\s)\\d{4})","testdata":"(123) 456-7890\n123-456-7890\n123.456.7890\n1234567890\n+31636363634\n075-63546725","testresult":"(123) 456-7890\n123-456-7890","id":"5977e634779e8e0011210a5e"}]
+[
+   {
+      "regex_string" : "([a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\\.[a-zA-Z]{2,})+)",
+      "id" : "5978a00ad6c30e0010b3824b",
+      "testdata" : "www.google.com\nhttp://dosomething.com/whatever\nhttps://it.sc.it",
+      "description" : "Domain name (without the http(s):// and without any path.",
+      "testresult" : "www.google.com\ndosomething.com",
+      "name" : "Domain Name"
+   },
+   {
+      "name" : "IPv4 Address",
+      "testresult" : "1.2.3.4\n1.0.0.0\n255.255.255.255\n1.1.1.1",
+      "testdata" : "1.2.3.4\n100.200.300.400\n1.0.0.0\n255.255.255.255\n1.1.1.1\n",
+      "description" : "Internet Protocol Version 4 address regular expression.",
+      "id" : "5978a00bd6c30e0010b3824c",
+      "regex_string" : "((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))"
+   },
+   {
+      "testdata" : "AA:BB:CC:DD:EE:FF\nA:B:C:D:E:F\nA:B:C:D:E:F:G\nAA:BB:CC:DD:EE:FF:GG",
+      "description" : "A simple MAC address regex in colon separator form",
+      "name" : "MAC Address",
+      "testresult" : "AA:BB:CC:DD:EE:FF\nAA:BB:CC:DD:EE:FF",
+      "regex_string" : "(([A-Fa-f0-9]{2}[:]){5}[A-Fa-f0-9]{2}[,]?)+",
+      "id" : "5978a00bd6c30e0010b3824d"
+   },
+   {
+      "id" : "5978a00bd6c30e0010b3824e",
+      "regex_string" : "([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\\.[a-zA-Z0-9._-]+)",
+      "testresult" : "test@gmail.com\njon.smith@foo.bar.com",
+      "name" : "Email Address",
+      "description" : "Email address regex",
+      "testdata" : "test@gmail.com\n1.email.com\n1@@gamil.com\n1@gcom\njon.smith@foo.bar.com"
+   },
+   {
+      "regex_string" : "(https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*))",
+      "id" : "5978a00bd6c30e0010b3824f",
+      "testdata" : "https://www.google.com/search\nhttp://foo.bar.com/a/path/to/something",
+      "description" : "Fully qualified domain names including http:// and paths.",
+      "testresult" : "https://www.google.com/search\nhttp://foo.bar.com/a/path/to/something",
+      "name" : "FQDN"
+   },
+   {
+      "name" : "Telephone Number",
+      "testresult" : "(123) 456-7890\n123-456-7890\n123.456.7890\n1234567890\n+31636363634\n075-63546725",
+      "testdata" : "(123) 456-7890\n123-456-7890\n123.456.7890\n1234567890\n+31636363634\n075-63546725",
+      "description" : "Generic telephone number regex.",
+      "id" : "5978a00bd6c30e0010b38250",
+      "regex_string" : "([\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6})"
+   },
+   {
+      "name" : "US Telephone Number",
+      "testresult" : "(123) 456-7890\n123-456-7890",
+      "testdata" : "(123) 456-7890\n123-456-7890\n123.456.7890\n1234567890\n+31636363634\n075-63546725",
+      "description" : "Common United States telephone number expression",
+      "id" : "5978a00bd6c30e0010b38251",
+      "regex_string" : "((\\()?\\d{3}(\\))?(-|\\s)?\\d{3}(-|\\s)\\d{4})"
+   },
+   {
+      "id" : "5978a4e7d6c30e0010b38252",
+      "regex_string" : "([a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\\.(?:com|org|edu|gov|uk|net|ca|de|jp|fr|au|us|ru|ch|it|nl|se|no|es|mil|cn|br|in|biz|info|io|jobs|mobi|name|tel))",
+      "name" : "Common Domain Name",
+      "testresult" : "something.com\nfoo.cn\nfoo.jp\nsomething.biz\nother.gov\nsomething.com",
+      "description" : "These domains have the most frequently used top level domains, as in they end in .com, org, biz, gov, etc.",
+      "testdata" : "foo.bar\nsomething.com\nfoo.cn\nfoo.jp\nsomething.biz\nsomething.foo\nsomething.bak\nsomething.other.gov\ngov.other\nsomething.com.foo.bar"
+   }
+]

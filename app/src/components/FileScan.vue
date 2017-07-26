@@ -28,13 +28,34 @@
       <progress ref="progress" class="progress" value="0" max="100">0%</progress>
     </div>
     <div v-if="showing" style="margin-top:5px;">
-      <section v-for="(result, name) in results" key="index">
-        <label class="label">
-          {{ name }}
-          <span class="tag is-success">{{ result.length }}</span>
-        </label>
-        <textarea class="textarea">{{ result.join("\n") }}</textarea>
-      </section>
+      <nav class="navbar is-transparent">
+        <div class="navbar-item has-dropdown">
+          <a class="navbar-link">
+            Docs
+          </a>
+      
+          <div class="navbar-dropdown is-boxed">
+            <a class="navbar-item">
+              Overview
+            </a>
+            <a class="navbar-item">
+              Elements
+            </a>
+            <a class="navbar-item">
+              Components
+            </a>
+            <hr class="navbar-divider">
+            <div class="navbar-item">
+              Version 0.4.4
+            </div>
+          </div>
+        </div>
+      </nav>
+      <file-scan-result-tabs :results='results'></file-scan-result-tabs>
+      <file-scan-result-table :results='results'></file-scan-result-table>
+      <div v-for="(result, name) in results" key="name">
+        <file-scan-result-box :name='name' :matches='result'></file-scan-result-box>
+      </div>
     </div>
   </div>
 </template>
@@ -45,6 +66,10 @@
   import LineReader from '@/lib/LineReader'
   import bytesToSize from '@/lib/bytesToSize'
   import FileSaver from 'file-saver'
+  import Matcher from '@/lib/Matcher'
+  import FileScanResultTable from '@/components/FileScanResultTable'
+  import FileScanResultTabs from '@/components/FileScanResultTabs'
+  import FileScanResultBox from '@/components/FileScanResultBox'
 
   export default {
     name: 'FileScan',
@@ -52,6 +77,10 @@
       file: {
         type: File,
         required: true
+      },
+      combine: {
+        type: String,
+        default: 'unique'
       }
     },
     data () {
@@ -90,7 +119,71 @@
           this.$refs.progress.className = 'progress ' + color
         }
       },
+      processResult (match, name, line, linenumber, pattern) {
+        if (this.combine === 'discrete') {
+          this.count += 1
+          this.results[name].push(match)
+        } else if (this.combine === 'counts') {
+          if (this.results[name][match]) {
+            this.results[name][match] += 1
+          } else {
+            this.results[name][match] = 1
+          }
+        } else { // default is unique
+          if (this.results[name].indexOf(match) === -1) {
+            this.count += 1
+            this.results[name].push(match)
+          }
+        }
+      },
       start () {
+        let self = this
+        self.running = true
+        self.results = {}
+        self.headers = []
+        let file = this.file
+        let reader = LineReader({ chunkSize: 10240 })
+        let regexs = {}
+        let patterns = {}
+        let linenumber = 0
+        self.patterns.forEach(function (pattern) {
+          self.results[pattern.name] = []
+          regexs[pattern.name] = new RegExp(pattern.regex_string, 'gmi')
+          patterns[pattern.name] = pattern
+        })
+
+        reader.on('line', function (line, next, percent) {
+          linenumber += 1
+          self.setPercent(percent, 'is-warning')
+          for (let name in regexs) {
+            if (regexs.hasOwnProperty(name)) {
+              let matches = Matcher(regexs[name], line, patterns[name])
+              if (matches.length) {
+                matches.forEach(function (match) {
+                  self.processResult(match, name, line, linenumber, patterns[name])
+                })
+              }
+            }
+          }
+          if (self.running) {
+            next()
+          }
+        })
+
+        reader.on('error', function (err) {
+          self.setPercent(null, 'is-danger')
+          self.error = err.toString()
+          self.running = false
+        })
+
+        reader.on('end', function () {
+          self.setPercent(100, 'is-success')
+          self.running = false
+        })
+
+        reader.read(file)
+      },
+      startold () {
         let self = this
         self.running = true
         let file = this.file
@@ -136,6 +229,11 @@
       stop () {
         this.running = false
       }
+    },
+    components: {
+      FileScanResultTable,
+      FileScanResultTabs,
+      FileScanResultBox
     }
   }
 </script>

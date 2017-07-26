@@ -82,8 +82,47 @@
               <div class="field">
                 <label class="label">Extracted Test Result</label>
                 <div class="control">
-                  <pre>{{ result.map(function (r) { return r.parsed }).join('\n') }}</pre>
+                  <pre>{{ result.join('\n') }}</pre>
                 </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="field">
+            <div class="is-pulled-right">
+              <span @click="advanced = !advanced" class="icon">
+                <i :class="advanced ? 'fa fa-angle-up' : 'fa fa-angle-down'"></i>
+              </span>
+            </div>
+            <label @click="advanced = !advanced" class="label">Advanced</label>
+          </div>
+          
+          <div v-if="advanced">
+            <hr>
+            <div class="field">
+              <label class="label">
+                Custom Line Parser
+                <span v-if="!parse.error" class="icon has-text-success"><span class="fa fa-check"></span></span>
+                <span v-else class="icon has-text-danger"><span class="fa fa-remove"></span></span>
+              </label>
+              <small>A parse function to parse each line</small>
+              <div class="control">
+                <textarea @change="validateParse" name="parse_line" class="textarea" :placeholder="parse.default">{{ parse.default_parse }}</textarea>
+                <span v-if="parse.error" class="has-text-danger">{{ parse.error }}</span>
+              </div>
+              <small>*You will still need to extract the pattern using the regex</small>
+            </div>
+
+            <div class="field">
+              <label class="label">
+                Post Processing
+                <span v-if="!postprocess.error" class="icon has-text-success"><span class="fa fa-check"></span></span>
+                <span v-else class="icon has-text-danger"><span class="fa fa-remove"></span></span>
+              </label>
+              <small>Custom processing function for each parsed value</small>
+              <div class="control">
+                <textarea @change="validatePostprocess" name="for_each_result" class="textarea" :placeholder="postprocess.default_postprocess">{{ postprocess.default_postprocess }}</textarea>
+                <span v-if="postprocess.error" class="has-text-danger">{{ postprocess.error }}</span>
               </div>
             </div>
           </div>
@@ -108,9 +147,10 @@
 <script>
   import serializeForm from '@/lib/serializeForm'
   import injectForm from '@/lib/injectForm'
-  import matchall from '@/lib/matchall'
   import { PatternTypes } from '@/store/mutation-types'
   import { mapGetters } from 'vuex'
+  import textToFunction from '@/lib/textToFunction'
+  import Matcher from '@/lib/Matcher'
 
   export default {
     name: 'PatternFormModal',
@@ -119,7 +159,16 @@
         cantest: false,
         passedtest: false,
         result: null,
-        reason: null
+        reason: null,
+        advanced: false,
+        postprocess: {
+          error: null,
+          default_postprocess: 'function (value, key, pattern, line) { return value; }'
+        },
+        parse: {
+          error: null,
+          default_parse: 'function (regex, line, pattern) { return line.substring(0, 10) }'
+        }
       }
     },
     computed: {
@@ -143,12 +192,12 @@
           this.cantest = true
         }
       },
-      dotest (formdata) {
-        let result = matchall(formdata.regex_string, formdata.testdata)
-        let resulttext = result.map(function (r) { return r.parsed }).join('\n')
-        let passed = formdata.regex_string && resulttext === formdata.testresult
+      dotest (pattern) {
+        let regex = new RegExp(pattern.regex_string, 'gmi')
+        let matches = Matcher(regex, pattern.testdata, pattern)
+        let passed = pattern.regex_string && matches.join('\n') === pattern.testresult
         let comp = passed ? ' equals ' : ' does not equal '
-        this.result = result
+        this.result = matches
         this.reason = 'Parsed example data ' + comp + ' the expected parsed result.'
         this.passedtest = passed
       },
@@ -170,12 +219,36 @@
       },
       close () {
         this.$store.dispatch(PatternTypes.unedit)
+      },
+      validateFunction (key, e) {
+        if (textToFunction(e.target.value)) {
+          this[key].error = null
+        } else if (!e.target.value) {
+          this[key].error = null
+        } else {
+          this[key].error = 'Invalid Function! ' + e.target.value
+        }
+      },
+      validatePostprocess: function (e) {
+        this.validateFunction('postprocess', e)
+      },
+      validateParse: function (e) {
+        this.validateFunction('parse', e)
+      }
+    },
+    created () {
+      if (this.current) {
+        if (this.current.for_each_result || this.current.parse_line) {
+          this.advanced = true
+        }
       }
     },
     mounted () {
-      if (this.current && this.$refs.form) {
-        this.cantest = true
-        injectForm(this.$refs.form, this.current)
+      if (this.current) {
+        if (this.$refs.form) {
+          this.cantest = true
+          injectForm(this.$refs.form, this.current)
+        }
       }
     }
   }
