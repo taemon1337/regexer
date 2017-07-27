@@ -15,3 +15,8 @@ export const PatternTypes = {
   selected: 'Pattern.selected',
   select: 'Pattern.select'
 }
+
+export const GlobalTypes = {
+  fullscreen: 'Global.fullscreen',
+  filter: 'Global.filter'
+}

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import ipgeo from './ipgeo'
 
 let defaultPatterns = require('@/assets/patterns.json')
 let base = '/api'
@@ -31,5 +32,6 @@ let patterns = {
 }
 
 export default {
-  patterns: patterns
+  patterns: patterns,
+  ipgeo: ipgeo
 }

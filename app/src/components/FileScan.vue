@@ -12,77 +12,74 @@
         <strong>{{ file.name }}</strong>
         <small>({{ formatBytes(file.size) }})</small>
         <small>({{ file.type }})</small>
+        <div class="media">
+          <div class="media-content">
+            <button v-if="!running" @click='start' class="button is-primary" type="button">Scan</button>
+            <button v-if="running" @click='stop' class="button is-danger" type="button">Stop</button>
+            <div class="is-pulled-right">
+              <button v-if="count > 0" class="button is-primary" @click='saveToDisk' title="Download Output">Download</button>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="media-right">
-        <button v-if="!running" @click='start' class="button is-primary" type="button">Scan</button>
-        <button v-if="running" @click='stop' class="button is-primary" type="button">Stop</button>
         <span class="icon" @click="showing = !showing">
           <i :class="showing ? 'fa fa-angle-up' : 'fa fa-angle-down'"></i>
         </span>
       </div>
     </div>
-    <div style="margin-top:5px;">
-      <progress ref="progress" class="progress" value="0" max="100">0%</progress>
+    <div v-if="progress" style="margin-top:5px;">
+      <progress :class="progressClass" :value="progress" max="100">{{ progress }}%</progress>
     </div>
     <div v-if="showing" style="margin-top:5px;">
       <nav class="navbar is-transparent">
         <div class="navbar-item">
-          <button v-if="count > 0" class="button is-primary" @click='saveToDisk' title="Download Output">
-            Download
-          </button>
+          <div class="field has-addons">
+            <div class="control">
+              <input ref='filterInput' @change="filterResults" class="input" type="text" placeholder="Filter results...">
+            </div>
+            <div v-if="filter" class="control">
+              <button class="button" @click.prevent.stop="clearFilter">
+                <span class="icon"><i class="delete"></i></span>
+              </button>
+            </div>
+          </div>
         </div>
         <div class="navbar-end"></div>
         <div class="navbar-item">
-          <button v-for="v in ['list','columns','table']" :class="viewclass(v)" :title="v + ' view'" @click="view = v">
+          <div class="select">
+            <select @change="setView">
+              <option value='list'>List View</option>
+              <option value='tabs'>Tabs View</option>
+              <option value='table'>Table View</option>
+            </select>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <button class="button" @click='toggleFullscreen' title="">
             <span class="icon">
-              <i :class="'fa fa-' + v"></i>
+              <i :class="fullscreen ? 'fa fa-long-arrow-left' : 'fa fa-arrows-h'"></i>
             </span>
           </button>
-        </div>
-        <div :class="settings ? 'navbar-item has-dropdown is-active' : 'navbar-item has-dropdown'">
-          <a @click="toggleSettings" class="navbar-link is-small">
-            <span class="icon">
-              <i class="fa fa-cog"></i>
-            </span>
-          </a>
-      
-          <div class="navbar-dropdown is-boxed is-small">
-            <a class="navbar-item is-active">
-              View
-            </a>
-            <div class="navbar-dropdown is-active">
-              <a class="navbar-item">Tabbed View</a>
-            </div>
-            <a class="navbar-item">
-              Elements
-            </a>
-            <a class="navbar-item">
-              Components
-            </a>
-            <hr class="navbar-divider">
-            <div class="navbar-item">
-              Version 0.4.4
-            </div>
-          </div>
         </div>
       </nav>
       <div v-if="view === 'list'">
         <div v-for="(result, name) in results" key="name">
-          <file-scan-result-box :name='name' :matches='result'></file-scan-result-box>
+          <file-scan-result-box :name='name' :matches='result' :filter='filter'></file-scan-result-box>
         </div>
       </div>
-      <div v-else-if="view === 'columns'">
-        <file-scan-result-tabs :results='results'></file-scan-result-tabs>
+      <div v-else-if="view === 'tabs'">
+        <file-scan-result-tabs :results='results' :filter='filter'></file-scan-result-tabs>
       </div>
       <div v-else>
-        <file-scan-result-table :results='results'></file-scan-result-table>
+        <file-scan-result-table :results='results' :filter='filter'></file-scan-result-table>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import { PatternTypes } from '@/store/mutation-types'
+  import { PatternTypes, GlobalTypes } from '@/store/mutation-types'
   import { mapGetters } from 'vuex'
   import LineReader from '@/lib/LineReader'
   import bytesToSize from '@/lib/bytesToSize'
@@ -110,20 +107,29 @@
         count: null,
         showing: false,
         results: {},
+        progress: 0,
         error: null,
-        settings: false,
-        view: 'list'
+        view: 'list',
+        filter: null
       }
     },
     computed: {
       ...mapGetters({
-        patterns: PatternTypes.selected
-      })
+        patterns: PatternTypes.selected,
+        fullscreen: GlobalTypes.fullscreen
+      }),
+      progressClass () {
+        return this.error ? 'progress is-danger' : this.progress < 100 ? 'progress is-warning' : 'progress is-success'
+      }
     },
     methods: {
       saveToDisk () {
         let filename = this.file.name + '.out.json'
         let data = {
+          file: { name: this.file.name, size: this.file.size, readableSize: bytesToSize(this.file.size), type: this.file.type },
+          filter: this.filter,
+          progress: this.progress + '%',
+          total: this.count,
           patterns: this.patterns,
           results: this.results
         }
@@ -133,17 +139,7 @@
       formatBytes (bytes) {
         return bytesToSize(bytes)
       },
-      setPercent (percent, color) {
-        if (percent) {
-          this.$refs.progress.value = percent
-          this.$refs.progress.text = percent + '%'
-        }
-        if (color) {
-          this.$refs.progress.className = 'progress ' + color
-        }
-      },
       processResult (match, name, line, linenumber, pattern) {
-        console.log('MATCH: ', match)
         if (this.combine === 'discrete') {
           this.count += 1
           this.results[name].push(match)
@@ -162,6 +158,7 @@
       },
       start () {
         let self = this
+        self.count = 0
         self.running = true
         self.results = {}
         self.headers = []
@@ -178,7 +175,7 @@
 
         reader.on('line', function (line, next, percent) {
           linenumber += 1
-          self.setPercent(percent, 'is-warning')
+          self.progress = percent
           for (let name in regexs) {
             if (regexs.hasOwnProperty(name)) {
               let matches = Matcher(regexs[name], line, patterns[name])
@@ -195,13 +192,12 @@
         })
 
         reader.on('error', function (err) {
-          self.setPercent(null, 'is-danger')
           self.error = err.toString()
           self.running = false
         })
 
         reader.on('end', function () {
-          self.setPercent(100, 'is-success')
+          self.progress = 100
           self.running = false
         })
 
@@ -210,11 +206,22 @@
       stop () {
         this.running = false
       },
-      toggleSettings () {
-        this.settings = !this.settings
-      },
       viewclass (view) {
         return this.view === view ? 'button is-small is-primary' : 'button is-small'
+      },
+      setView (e) {
+        console.log('setting view...')
+        this.view = e.target.value
+      },
+      toggleFullscreen () {
+        this.$store.dispatch(GlobalTypes.fullscreen)
+      },
+      filterResults (e) {
+        this.filter = e.target.value
+      },
+      clearFilter () {
+        this.filter = null
+        this.$refs.filterInput.value = ''
       }
     },
     components: {

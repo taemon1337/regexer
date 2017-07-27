@@ -33,7 +33,7 @@
         <div class="media">
           <div class="media-content" style="overflow:auto;">
             <dl>
-              <dd><strong>Pattern:</strong></dd>
+              <dd><strong>Pattern:</strong><small :title="'SHA256:' + pattern.regex_sha256">{{ patternId(pattern) }} &hellip;</small></dd>
               <dt><pre>{{ pattern.regex_string }}</pre></dt>
               <dd><strong>Examples:</strong></dd>
               <dt><pre>{{ pattern.testresult }}</pre></dt>
@@ -80,6 +80,9 @@
       },
       edit (pattern) {
         this.$store.dispatch(PatternTypes.edit, pattern)
+      },
+      patternId (pattern) {
+        return pattern.regex_sha256 ? pattern.regex_sha256.substring(0, 8) : ''
       }
     },
     created () {

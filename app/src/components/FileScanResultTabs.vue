@@ -11,7 +11,7 @@
       </ul>
     </div>
     <div v-if='active'>
-      <file-scan-result-box :name='active' :matches='results[active]'></file-scan-result-box>
+      <file-scan-result-box :name='active' :matches='results[active]' :filter='filter'></file-scan-result-box>
     </div>
   </div>
 </template>
@@ -25,6 +25,10 @@
       results: {
         type: Object,
         required: true
+      },
+      filter: {
+        type: String,
+        default: ''
       }
     },
     data () {

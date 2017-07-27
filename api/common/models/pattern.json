@@ -18,6 +18,9 @@
       "type": "string",
       "required": true
     },
+    "regex_sha256": {
+      "type": "string"
+    },
     "testdata": {
       "type": "string"
     },

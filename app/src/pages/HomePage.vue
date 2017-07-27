@@ -22,11 +22,11 @@
       </div>
     </section>
     <section class="columns">
-      <div class="column is-half">
+      <div :class="fullscreen ? 'column is-12' : 'column is-half'" style="max-width:100%;">
         <h1 class="title">Scan files to selected patterns</h1>
         <new-scan-form></new-scan-form>
       </div>
-      <div class="column is-half">
+      <div v-if="!fullscreen" class="column is-half">
         <h1 class="title">Available Patterns</h1>
         <list-patterns></list-patterns>
       </div>
@@ -37,12 +37,18 @@
 <script>
   import NewScanForm from '@/components/NewScanForm'
   import ListPatterns from '@/components/ListPatterns'
-  import { PatternTypes } from '@/store/mutation-types'
+  import { PatternTypes, GlobalTypes } from '@/store/mutation-types'
+  import { mapGetters } from 'vuex'
 
   export default {
     name: 'HomePage',
     data () {
       return {}
+    },
+    computed: {
+      ...mapGetters({
+        fullscreen: GlobalTypes.fullscreen
+      })
     },
     methods: {
       createPattern () {
