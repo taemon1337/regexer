@@ -16,6 +16,17 @@ export const PatternTypes = {
   select: 'Pattern.select'
 }
 
+export const EnrichTypes = {
+  current: 'Enrich.current',
+  edit: 'Enrich.edit',
+  unedit: 'Enrich.unedit',
+  fetch: 'Enrich.fetch',
+  save: 'Enrich.save',
+  remove: 'Enrich.delete',
+  selected: 'Enrich.selected',
+  select: 'Enrich.select'
+}
+
 export const GlobalTypes = {
   fullscreen: 'Global.fullscreen',
   filter: 'Global.filter'

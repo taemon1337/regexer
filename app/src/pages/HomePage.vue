@@ -29,6 +29,14 @@
       <div v-if="!fullscreen" class="column is-half">
         <h1 class="title">Available Patterns</h1>
         <list-patterns></list-patterns>
+        <hr>
+        <div class="is-pulled-right">
+          <button class="button" @click="createEnrich">
+            Create Enrichment
+          </button>
+        </div>
+        <h1 class="title">Available Enrichments</h1>
+        <list-enrichs></list-enrichs>
       </div>
     </section>
   </div>
@@ -37,7 +45,8 @@
 <script>
   import NewScanForm from '@/components/NewScanForm'
   import ListPatterns from '@/components/ListPatterns'
-  import { PatternTypes, GlobalTypes } from '@/store/mutation-types'
+  import ListEnrichs from '@/components/ListEnrichs'
+  import { PatternTypes, EnrichTypes, GlobalTypes } from '@/store/mutation-types'
   import { mapGetters } from 'vuex'
 
   export default {
@@ -53,11 +62,15 @@
     methods: {
       createPattern () {
         this.$store.dispatch(PatternTypes.edit)
+      },
+      createEnrich () {
+        this.$store.dispatch(EnrichTypes.edit)
       }
     },
     components: {
       NewScanForm,
-      ListPatterns
+      ListPatterns,
+      ListEnrichs
     }
   }
 </script>

@@ -38,5 +38,9 @@
   "pattern": {
     "dataSource": "mongodb",
     "public": true
+  },
+  "enrich": {
+    "dataSource": "mongodb",
+    "public": true
   }
 }

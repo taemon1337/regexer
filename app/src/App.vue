@@ -1,7 +1,8 @@
 <template>
   <div id="app">
     <div class="container">
-      <pattern-form-modal v-if="editing"></pattern-form-modal>
+      <pattern-form-modal v-if="editingPattern"></pattern-form-modal>
+      <enrich-form-modal v-if="editingEnrich"></enrich-form-modal>
       <error-messages></error-messages>
       <router-view></router-view>
     </div>
@@ -13,19 +14,22 @@
   import 'font-awesome/css/font-awesome.css'
   import ErrorMessages from '@/components/ErrorMessages'
   import PatternFormModal from '@/components/PatternFormModal'
-  import { PatternTypes } from '@/store/mutation-types'
+  import EnrichFormModal from '@/components/EnrichFormModal'
+  import { PatternTypes, EnrichTypes } from '@/store/mutation-types'
   import { mapGetters } from 'vuex'
   
   export default {
     name: 'app',
     computed: {
       ...mapGetters({
-        editing: PatternTypes.edit
+        editingPattern: PatternTypes.edit,
+        editingEnrich: EnrichTypes.edit
       })
     },
     components: {
       ErrorMessages,
-      PatternFormModal
+      PatternFormModal,
+      EnrichFormModal
     }
   }
 </script>
