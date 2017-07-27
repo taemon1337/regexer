@@ -3,7 +3,10 @@
     <div class="tabs is-fullwidth">
       <ul>
         <li v-for="(result, name) in results" key="name" :class="isActive(name) ? 'is-active' : ''">
-          <a href='#' @click='active = name'>{{ name }}</a>
+          <a href='#' @click='active = name'>
+            {{ name }}
+            <span class="tag" style="font-size:8px;">{{ result.length }}</span>
+          </a>
         </li>
       </ul>
     </div>

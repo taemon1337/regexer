@@ -1,12 +1,16 @@
 <template>
   <div style="overflow:auto;">
     <table class="table">
+      <thead>
+        <tr>
+          <th style='min-width:200px;'>Pattern</th>
+          <th>Match</th>
+        </tr>
+      </thead>
       <tbody>
-        <tr v-for="(result, name) in results" key="name">
-          <td>{{ name }}</td>
-          <td>{{ result.length }}</td>
-          <td>{{ result.join(', ') }}</td>
-          <!--<td v-for="(value, index) in result[name]" key="index">{{ value }}</td>-->
+        <tr v-for="obj in flatResults" key="name">
+          <td>{{ obj.name }}</td>
+          <td>{{ obj.match }}</td>
         </tr>
       </tbody>
     </table>
@@ -24,6 +28,17 @@
     },
     data () {
       return {}
+    },
+    computed: {
+      flatResults () {
+        let a = []
+        for (let name in this.results) {
+          this.results[name].forEach(function (match) {
+            a.push({ name: name, match: match })
+          })
+        }
+        return a
+      }
     }
   }
 </script>
