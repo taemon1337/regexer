@@ -34,7 +34,7 @@
           <div class="media-content" style="overflow:auto;">
             <dl>
               <dd><strong>Enrich:</strong></dd>
-              <dt><pre>{{ enrich.regex_string }}</pre></dt>
+              <dt><pre>{{ enrich.enrich_function }}</pre></dt>
               <dd><strong>Examples:</strong></dd>
               <dt><pre>{{ enrich.testresult }}</pre></dt>
             </dl>

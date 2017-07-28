@@ -23,6 +23,35 @@
               <textarea rows='3' name="description" class="textarea" placeholder="description..."></textarea>
             </div>
           </div>
+
+          <div class="columns">
+            <div class="column">
+              <div class="field">
+                <label class="label">Accepted Patterns</label>
+                <div class="select is-multiple">
+                  <select name="accepted_patterns" multiple size="4" required>
+                    <option v-for="(pattern, index) in patterns" key="index" :value="pattern.id">{{ pattern.name }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="column">
+              <label class="checkbox">
+                <input name="batchable" type="checkbox" value="1" checked>
+                Enable Batch Processing
+              </label>
+              <div class="notification thin">
+                Enabling batch processing will provide an array of matches to the enrich function instead of a single.
+              </div>
+              <label class="checkbox">
+                <input name="cacheable" type="checkbox" value="1" checked>
+                Cache Results
+              </label>
+              <div class="notification thin">
+                Caching should be used when the same input will always be enriched with the same output
+              </div>
+            </div>
+          </div>
             
           <div class="columns">
             <div class="column">
@@ -51,10 +80,16 @@
             </label>
             <small>A function to enrich a pattern match</small>
             <div class="control">
-              <textarea @change="validateEnrich" name="parse_line" class="textarea" :placeholder="enrichfn.default">{{ enrichfn.default_parse }}</textarea>
+              <textarea @change="validateEnrich" name="enrich_function" class="textarea" :placeholder="enrichfn.default_enrich">{{ enrichfn.default_enrich }}</textarea>
               <span v-if="enrichfn.error" class="has-text-danger">{{ enrichfn.error }}</span>
             </div>
-            <small>*Axios is a http library for javascript</small>
+            <ul class="notification thin">
+              <li>*First arg to the enrich function is a match value or an array of matched values (for batch mode)</li>
+              <li>*2nd arg is the current pattern that has produced the matched value</li>
+              <li>*3rd arg is <a target="_blank" href='https://github.com/mzabriskie/axios'>Axios</a> which is a http library for javascript for remote enrichments.</li>
+              <li>*Enrich functions may return a value or an array of values in batch mode</li>
+              <li>*Enrich functions may also return a Promise which resolves a value or an array of values</li>
+            </ul>
           </div>
           
           <div v-if="result" class="columns is-multiline">
@@ -106,7 +141,33 @@
           
           <div v-if="advanced">
             <hr>
-            Advanced
+            <strong>Example Functions</strong>
+            <pre>
+              # Simple example (not batch mode)
+              function (match, pattern, axios) {
+                return match.substring(0, 10);
+              }
+            </pre>
+            <pre>
+              # Simple example (batch mode)
+              function (matches, pattern, axios) {
+                return matches.map(function (match) { return match.substring(0, 10) });
+              }
+            </pre>
+            <pre>
+              # Simple example returns a Promise
+              function (match, pattern, axios) {
+                return new Promise(function (resolve, reject) {
+                  resolve(match.substring(0, 10))
+                });
+              }
+            </pre>
+            <pre>
+              # Batch mode remote api query
+              function (matches, pattern, axios) {
+                return axios.get('http://api:8080/batch', matches)
+              }
+            </pre>
           </div>
         </form>
       </section>
@@ -129,10 +190,10 @@
 <script>
   import serializeForm from '@/lib/serializeForm'
   import injectForm from '@/lib/injectForm'
-  import { EnrichTypes } from '@/store/mutation-types'
+  import { EnrichTypes, PatternTypes } from '@/store/mutation-types'
   import { mapGetters } from 'vuex'
   import textToFunction from '@/lib/textToFunction'
-  import Matcher from '@/lib/Matcher'
+  import Enricher from '@/lib/Enricher'
 
   export default {
     name: 'EnrichFormModal',
@@ -156,7 +217,8 @@
     computed: {
       ...mapGetters({
         editing: EnrichTypes.edit,
-        current: EnrichTypes.current
+        current: EnrichTypes.current,
+        patterns: PatternTypes.fetch
       })
     },
     methods: {
@@ -170,16 +232,20 @@
       },
       docantest () {
         let formdata = serializeForm(this.$refs.form)
-        if (formdata.name && formdata.regex_string) {
+        if (formdata.name && formdata.enrich_function) {
           this.cantest = true
         }
       },
       dotest (enrich) {
-        let regex = new RegExp(enrich.regex_string, 'gmi')
-        let matches = Matcher(regex, enrich.testdata, enrich)
-        let passed = enrich.regex_string && matches.join('\n') === enrich.testresult
+        let self = this
+        let results = []
+        let patterns = self.patterns.filter(function (p) { return enrich.accepted_patterns.indexOf(p.id) >= 0 })
+        enrich.testdata.split('\n').forEach(function (line) {
+          results.push(Enricher(line, patterns[0], enrich))
+        })
+        let passed = enrich.enrich_function && results.join('\n') === enrich.testresult
         let comp = passed ? ' equals ' : ' does not equal '
-        this.result = matches
+        this.result = results
         this.reason = 'Parsed example data ' + comp + ' the expected parsed result.'
         this.passedtest = passed
       },
@@ -213,11 +279,12 @@
       },
       validateEnrich: function (e) {
         this.validateFunction('enrichfn', e)
+        this.docantest()
       }
     },
     created () {
       if (this.current) {
-        if (this.current.for_each_result || this.current.parse_line) {
+        if (this.current.enrich_function) {
           this.advanced = true
         }
       }
@@ -232,3 +299,10 @@
     }
   }
 </script>
+
+<style scoped="true">
+  .thin {
+    font-size:10px;
+    padding:7px;
+  }
+</style>

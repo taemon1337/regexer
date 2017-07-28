@@ -14,9 +14,13 @@
     "description": {
       "type": "string"
     },
-    "batch": {
+    "batchable": {
       "type": "boolean",
       "default": false
+    },
+    "cacheable": {
+      "type": "boolean",
+      "default": true
     },
     "accepted_patterns": {
       "type": "array",
