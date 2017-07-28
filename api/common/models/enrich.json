@@ -29,6 +29,12 @@
     "enrich_function": {
       "type": "string",
       "required": true
+    },
+    "batch_size": {
+      "type": "number"
+    },
+    "max_per_minute": {
+      "type": "number"
     }
   },
   "validations": [],

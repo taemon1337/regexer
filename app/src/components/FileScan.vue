@@ -3,7 +3,7 @@
     <div class="media">
       <div class="media-left" style="width:50px;">
         <span v-if="count" class="tag is-success">{{ count }}</span>
-        <span class="icon" v-if="running">
+        <span class="icon" v-if="running || enriching">
           <i class="fa fa-spin fa-spinner"></i>
         </span>
       </div>
@@ -79,12 +79,13 @@
 </template>
 
 <script>
-  import { PatternTypes, GlobalTypes } from '@/store/mutation-types'
+  import { PatternTypes, EnrichTypes, GlobalTypes } from '@/store/mutation-types'
   import { mapGetters } from 'vuex'
   import LineReader from '@/lib/LineReader'
   import bytesToSize from '@/lib/bytesToSize'
   import FileSaver from 'file-saver'
   import Matcher from '@/lib/Matcher'
+  import Enricher from '@/lib/Enricher'
   import FileScanResultTable from '@/components/FileScanResultTable'
   import FileScanResultTabs from '@/components/FileScanResultTabs'
   import FileScanResultBox from '@/components/FileScanResultBox'
@@ -108,6 +109,7 @@
         showing: false,
         results: {},
         progress: 0,
+        enriching: false,
         error: null,
         view: 'list',
         filter: null
@@ -116,10 +118,11 @@
     computed: {
       ...mapGetters({
         patterns: PatternTypes.selected,
+        enrichs: EnrichTypes.selected,
         fullscreen: GlobalTypes.fullscreen
       }),
       progressClass () {
-        return this.error ? 'progress is-danger' : this.progress < 100 ? 'progress is-warning' : 'progress is-success'
+        return this.error ? 'progress is-danger' : this.progress < 100 ? this.enriching ? 'progress is-info' : 'progress is-warning' : 'progress is-success'
       }
     },
     methods: {
@@ -199,9 +202,40 @@
         reader.on('end', function () {
           self.progress = 100
           self.running = false
+          setTimeout(function () {
+            self.startEnriching()
+          }, 1000)
         })
 
         reader.read(file)
+      },
+      startEnriching () {
+        let self = this
+        let total = self.enrichs.length
+        let count = 0
+        self.enriching = true
+        self.progress = 0
+        Promise.all(self.enrichs.map(function (enrich) {
+          let compatibles = self.patterns.filter(function (p) { return enrich.accepted_patterns.indexOf(p.id) })
+
+          return Promise.all(compatibles.map(function (pattern) {
+            total += 1
+            self.progress = Math.floor(count / total * 100)
+            let key = [pattern.name, enrich.name].join(' - ')
+            return Enricher(self.results[pattern.name], enrich).then(function (resp) {
+              self.results[key] = resp
+              count += 1
+              self.progress = Math.floor(count / total * 100)
+            })
+          }))
+        })).then(function (resp) {
+          self.progress = 100
+          self.enriching = false
+        })
+        .catch(function (err) {
+          self.error = err.toString()
+          self.enriching = false
+        })
       },
       stop () {
         this.running = false

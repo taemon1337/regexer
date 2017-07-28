@@ -2,7 +2,7 @@
   <section>
     <div style="margin-bottom:15px;">
       <strong>
-        Enrichs
+        Enrichments
         <span v-if="selected.length">({{ selected.length }} selected)</span>
       </strong>
     </div>

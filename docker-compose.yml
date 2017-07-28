@@ -1,4 +1,4 @@
-version: "2"
+version: "3"
 services:
   mongo:
     image: mongo:latest
@@ -12,6 +12,14 @@ services:
     command: npm start
     depends_on:
       - mongo
+  proxy:
+    build: 
+      context: ./app
+      dockerfile: Dockerfile.production
+    volumes:
+      - ./app:/app
+    working_dir: /app
+    command: node prod.js
   app:
     build: ./app
     volumes:

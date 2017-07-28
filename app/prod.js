@@ -13,5 +13,16 @@ app.all('/api*', function(req, res) {
   req.pipe(request(API+req.originalUrl)).pipe(res);
 });
 
+app.all('/proxy/*', function (req, res) {
+  try {
+    var url = req.originalUrl.toString().split('proxy/').pop();
+    console.log('PROXY -> ' + url)
+    return req.pipe(request(url)).pipe(res);
+  } catch (err) {
+    console.warn('Error in Proxy: ', err)
+    req.sendStatus(400)
+  }
+})
+
 server.on('request', app);
 server.listen(port, function() { console.log('Listening on ' + server.address().port) });

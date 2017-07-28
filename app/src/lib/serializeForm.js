@@ -25,7 +25,7 @@ export default function serializeForm (form) {
     } else if (el.nodeName === 'SELECT') {
       if (el.type === 'select-multiple') {
         let arr = []
-        for (j = el.options.length - 1; j <= 0; j = j - 1) {
+        for (j = 0; j < el.options.length; j += 1) {
           if (el.options[j].selected) {
             arr.push(el.options[j].value)
           }

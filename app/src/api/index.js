@@ -1,9 +1,18 @@
 import axios from 'axios'
-import ipgeo from './ipgeo'
 
 let defaultPatterns = require('@/assets/patterns.json')
 let defaultEnrichs = require('@/assets/enrichs.json')
 let base = '/api'
+
+let proxy = axios.create({
+  baseURL: '/proxy/',
+  timeout: 10000
+})
+
+proxy.interceptors.request.use(function (req) {
+  req.url = req.baseURL + req.url
+  return req
+})
 
 let patterns = {
   fetch: function () {
@@ -60,7 +69,8 @@ let enrichs = {
 }
 
 export default {
+  axios: axios,
+  proxy: proxy,
   patterns: patterns,
-  enrichs: enrichs,
-  ipgeo: ipgeo
+  enrichs: enrichs
 }

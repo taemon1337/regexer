@@ -4,11 +4,13 @@
       {{ name }}
       <span class="tag is-success">{{ computedMatches.length }}</span>
     </label>
-    <textarea class="textarea">{{ computedMatches.join('\n') }}</textarea>
+    <data-result textarea :result="computedMatches"></data-result>
   </section>
 </template>
 
 <script>
+  import DataResult from '@/components/DataResult'
+
   export default {
     name: 'FileScanResultBox',
     props: {
@@ -45,6 +47,9 @@
 
         return ret
       }
+    },
+    components: {
+      DataResult
     }
   }
 </script>

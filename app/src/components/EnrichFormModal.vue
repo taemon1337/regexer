@@ -29,7 +29,7 @@
               <div class="field">
                 <label class="label">Accepted Patterns</label>
                 <div class="select is-multiple">
-                  <select name="accepted_patterns" multiple size="4" required>
+                  <select @change='selectPatternsChanged' name="accepted_patterns" multiple size="4" required>
                     <option v-for="(pattern, index) in patterns" key="index" :value="pattern.id">{{ pattern.name }}</option>
                   </select>
                 </div>
@@ -43,22 +43,22 @@
               <div class="notification thin">
                 Enabling batch processing will provide an array of matches to the enrich function instead of a single.
               </div>
-              <label class="checkbox">
-                <input name="cacheable" type="checkbox" value="1" checked>
-                Cache Results
-              </label>
-              <div class="notification thin">
-                Caching should be used when the same input will always be enriched with the same output
-              </div>
+              <!--<label class="checkbox">-->
+              <!--  <input name="cacheable" type="checkbox" value="1" checked>-->
+              <!--  Cache Results-->
+              <!--</label>-->
+              <!--<div class="notification thin">-->
+              <!--  Caching should be used when the same input will always be enriched with the same output-->
+              <!--</div>-->
             </div>
           </div>
             
           <div class="columns">
             <div class="column">
               <div class="field">
-                <label class="label">Example Input Text</label>
+                <label class="label">Pattern Input</label>
                 <div class="control">
-                  <textarea rows='4' name="testdata" class="textarea" placeholder="lines of example data..."></textarea>
+                  <pre>{{ testData }}</pre>
                 </div>
               </div>
             </div>
@@ -85,9 +85,8 @@
             </div>
             <ul class="notification thin">
               <li>*First arg to the enrich function is a match value or an array of matched values (for batch mode)</li>
-              <li>*2nd arg is the current pattern that has produced the matched value</li>
-              <li>*3rd arg is <a target="_blank" href='https://github.com/mzabriskie/axios'>Axios</a> which is a http library for javascript for remote enrichments.</li>
-              <li>*Enrich functions may return a value or an array of values in batch mode</li>
+              <li>*2nd arg is <a target="_blank" href='https://github.com/mzabriskie/axios'>Axios</a> which is a http library for javascript for remote enrichments.</li>
+              <li>*Enrich functions may return a value or an array of values if using batch mode</li>
               <li>*Enrich functions may also return a Promise which resolves a value or an array of values</li>
             </ul>
           </div>
@@ -116,7 +115,7 @@
               <div class="field">
                 <label class="label">Parsed Test Result</label>
                 <div class="control">
-                  <pre>{{ result }}</pre>
+                  <data-result :result="result"></data-result>
                 </div>
               </div>
             </div>
@@ -124,7 +123,7 @@
               <div class="field">
                 <label class="label">Extracted Test Result</label>
                 <div class="control">
-                  <pre>{{ result.join('\n') }}</pre>
+                  <data-result :result="result.join('\n')"></data-result>
                 </div>
               </div>
             </div>
@@ -141,33 +140,29 @@
           
           <div v-if="advanced">
             <hr>
+            <div class="columns">
+              <div class="column">
+                <div class="field">
+                  <label class="label">Batch Size</label>
+                  <div class="control">
+                    <input name="batch_size" class="input" type="number" placeholder="100">
+                  </div>
+                  <small>Only effective if using batch mode.</small>
+                </div>
+              </div>
+              <div class="column">
+                <div class="field">
+                  <label class="label">Max Per Minute</label>
+                  <div class="control">
+                    <input name="max_per_minute" class="input" type="number" placeholder="150">
+                  </div>
+                  <small>Max number of batches to process in a single minute.</small>
+                </div>
+              </div>
+            </div>
+            
             <strong>Example Functions</strong>
-            <pre>
-              # Simple example (not batch mode)
-              function (match, pattern, axios) {
-                return match.substring(0, 10);
-              }
-            </pre>
-            <pre>
-              # Simple example (batch mode)
-              function (matches, pattern, axios) {
-                return matches.map(function (match) { return match.substring(0, 10) });
-              }
-            </pre>
-            <pre>
-              # Simple example returns a Promise
-              function (match, pattern, axios) {
-                return new Promise(function (resolve, reject) {
-                  resolve(match.substring(0, 10))
-                });
-              }
-            </pre>
-            <pre>
-              # Batch mode remote api query
-              function (matches, pattern, axios) {
-                return axios.get('http://api:8080/batch', matches)
-              }
-            </pre>
+            <pre style="white-space: pre-wrap;padding:7px;">{{ examples.join('\n') }}</pre>
           </div>
         </form>
       </section>
@@ -194,6 +189,7 @@
   import { mapGetters } from 'vuex'
   import textToFunction from '@/lib/textToFunction'
   import Enricher from '@/lib/Enricher'
+  import DataResult from '@/components/DataResult'
 
   export default {
     name: 'EnrichFormModal',
@@ -203,15 +199,18 @@
         passedtest: false,
         result: null,
         reason: null,
+        testData: '',
         enrichfn: {
           error: null,
-          default_enrich: 'function (match, pattern, axios) { return match }'
+          default_enrich: 'function (match, axios) { return match }'
         },
         advanced: false,
-        parse: {
-          error: null,
-          default_parse: 'function (regex, line, enrich) { return line.substring(0, 10) }'
-        }
+        examples: [
+          '# Simple example (not batch mode) \nfunction (match, axios) { \n  return match.substring(0, 10); \n}',
+          '# Simple example (batch mode) \nfunction (matches, axios) { \n  return matches.map(function (match) { \n    return match.substring(0, 10) \n  }); \n}',
+          '# Simple example returns a Promise \nfunction (match, axios) { \n  return new Promise(function (resolve, reject) { \n    resolve(match.substring(0, 10)) \n  }); \n}',
+          '# Batch mode remote api query \nfunction (matches, axios) { \n  var data = matches.map(function (m) { return { query: m }});\n  return axios.post("http://ip-api.com/batch", data) \n}'
+        ]
       }
     },
     computed: {
@@ -238,16 +237,18 @@
       },
       dotest (enrich) {
         let self = this
-        let results = []
-        let patterns = self.patterns.filter(function (p) { return enrich.accepted_patterns.indexOf(p.id) >= 0 })
-        enrich.testdata.split('\n').forEach(function (line) {
-          results.push(Enricher(line, patterns[0], enrich))
+        let batch = self.testData.split('\n')
+        Enricher(batch, enrich).then(function (results) {
+          let passed = enrich.enrich_function && results.join('\n') === enrich.testresult
+          let comp = passed ? ' equals ' : ' does not equal '
+          self.result = results
+          self.reason = 'Parsed example data ' + comp + ' the expected parsed result.'
+          self.passedtest = passed
+        }).catch(function (err) {
+          console.warn('Failed Test: ', err)
+          self.passedtest = false
+          self.reason = err.toString()
         })
-        let passed = enrich.enrich_function && results.join('\n') === enrich.testresult
-        let comp = passed ? ' equals ' : ' does not equal '
-        this.result = results
-        this.reason = 'Parsed example data ' + comp + ' the expected parsed result.'
-        this.passedtest = passed
       },
       save (e) {
         let formdata = serializeForm(this.$refs.form)
@@ -280,6 +281,19 @@
       validateEnrich: function (e) {
         this.validateFunction('enrichfn', e)
         this.docantest()
+      },
+      selectPatternsChanged (e) {
+        let formdata = serializeForm(this.$refs.form)
+        this.setTestData(formdata)
+      },
+      setTestData (enrich) {
+        let td = []
+        this.patterns.forEach(function (p) {
+          if (enrich.accepted_patterns.indexOf(p.id) >= 0) {
+            td.push(p.testresult)
+          }
+        })
+        this.testData = td.join('\n')
       }
     },
     created () {
@@ -295,7 +309,11 @@
           this.cantest = true
           injectForm(this.$refs.form, this.current)
         }
+        this.setTestData(this.current)
       }
+    },
+    components: {
+      DataResult
     }
   }
 </script>
