@@ -1,8 +1,6 @@
 import api from '@/api'
 import isArray from '@/lib/isArray'
-import isPromise from '@/lib/isPromise'
-
-window.api = api
+import Promisify from '@/lib/Promisify'
 
 let defaults = {
   batchSize: 100,
@@ -10,82 +8,43 @@ let defaults = {
   timeout: 10000
 }
 
-let findArray = function (obj, failure) {
-  if (isArray(obj)) {
-    return obj
-  } else if (typeof obj === 'object') {
-    if (isArray(obj.data)) {
-      return obj.data
-    } else {
-      for (let key in obj) { // check each key for an array and return the first found
-        if (isArray(obj[key])) {
-          return obj[key]
-        }
-      }
-    }
-  }
-  console.error('Could not find array result!', obj)
-  failure('Could not find array result!')
-}
-
 /**
- * Batcher returns a Promise
+ * Batcher returns a Promise which resolves an array of results
  * Args:
  *   all - an array of items to be batch processed
- *   batchHandler - a function to receive a batch of items to process
- *   resultHandler - used if batchHandler returns a Promise
+ *   batchHandler - a function to receive a batch of items to process which can return a promise or a value
  *   opts - { batchSize: 100, maxPerMinute: 150 } overrides
- * if batchHandler function returns a Promise...
- *   then the resultHandler is passed each batchHandler response
- * else if batchHandler function returns an Array
- *   then the returned Promise will resolve with all returned arrays concatted into a single array
  */
 export default function Batcher (all, batchHandler, opts) {
   let batchSize = opts.batchSize > 0 ? opts.batchSize : defaults.batchSize
   let maxPerMinute = opts.maxPerMinute > 0 ? opts.maxPerMinute : defaults.maxPerMinute
+  let promisify = Promisify(batchHandler)
 
-  return new Promise(function (resolve, reject) {
-    if (!isArray(all)) {
-      let msg = 'Invalid argument, not an array, but a ' + (typeof all)
-      console.error(msg, all)
-      reject(new Error(msg))
-    }
-    let results = []
-    let count = 0
+  if (isArray(all) && typeof batchHandler === 'function') {
+    return new Promise(function (resolve, reject) {
+      let index = 0
+      let results = []
 
-    let next = function (batch) {
-      count += 1
-      console.log('Batch ' + count + ': ' + batch.length + ' items...')
-      let result = batchHandler(batch, api.proxy)
+      let next = function (batch) {
+        index += batchSize
 
-      if (isPromise(result)) {
-        result.then(function (resp) {
-          results = results.concat(findArray(resp, reject))
+        let result = promisify(batch, api.proxy) // result will be a promise
+        result.then(function (batchResults) {
+          results = results.concat(batchResults)
 
-          if (all.length < 1) {
+          if (index > all.length) {
             resolve(results)
           } else {
             setTimeout(function () {
-              next(all.splice(0, batchSize))
+              next(all.slice(index, index + batchSize))
             }, 60 * 1000 / maxPerMinute)
           }
-        }).catch(reject)
-      } else if (isArray(result)) {
-        results = results.concat(result)
-
-        if (all.length < 1) {
-          return results
-        } else {
-          setTimeout(function () {
-            next(all.splice(0, batchSize))
-          }, 60 * 1000 / maxPerMinute)
-        }
-      } else {
-        console.error('Invalid Batch Handler Result: ', result)
-        reject(new Error('Invalid Batch Handler Result'))
+        })
       }
-    }
 
-    next(all.splice(0, batchSize)) // process 1st batch
-  })
+      next(all.slice(index, index + batchSize)) // process 1st batch
+    })
+  } else {
+    throw new Error('Invalid arguments, Batcher requires an array of items to process with given batchHandler')
+  }
 }

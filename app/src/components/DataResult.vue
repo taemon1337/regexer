@@ -1,7 +1,7 @@
 <template>
   <div>
-    <textarea v-if="textarea" class="textarea">{{ computedResult }}</textarea>
-    <pre v-else>{{ computedResult }}</pre>
+    <textarea v-if="textarea" class="textarea">{{ result | stringify }}</textarea>
+    <pre v-else>{{ result | stringify }}</pre>
   </div>
 </template>
 
@@ -20,15 +20,6 @@
     },
     data () {
       return {}
-    },
-    computed: {
-      computedResult (obj) {
-        if (typeof obj === 'object') {
-          return obj
-        } else {
-          return obj
-        }
-      }
     }
   }
 </script>

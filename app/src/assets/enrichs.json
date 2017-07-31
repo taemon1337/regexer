@@ -1,1 +1,33 @@
-[]
+[
+   {
+      "for_each_result" : "function (value, input, enrich) {\n  var out = input + \": \";\n  if (value.status === \"success\") {\n    out += [value.regionName, value.city, value.country].join(\", \")\n  } else {\n     out += value.message\n  }\n  return out;\n}",
+      "enrich_function" : "function (matches, axios) { \n  var data = matches.map(function (m) { return { query: m }});\n  return axios.post(\"http://ip-api.com/batch\", data) \n}",
+      "max_per_minute" : 0,
+      "accepted_patterns" : [
+         "59778b4a65e3b0000fb5d6c5",
+         "597b811e7fd61f000fda07fe"
+      ],
+      "testresult" : "1.2.3.4: Washington, Mukilteo, United States\n1.0.0.0: Queensland, South Brisbane, Australia\n255.255.255.255: reserved range\n1.1.1.1: Victoria, Research, Australia\n1.2.3.0: Washington, Mukilteo, United States\n10.20.30.0: private range",
+      "cacheable" : true,
+      "batchable" : true,
+      "batch_size" : 0,
+      "id" : "597b1ba168507b000fc3b991",
+      "description" : "Geolocate IP address matches using the ip-api.com free service.",
+      "name" : "IP Geolocation"
+   },
+   {
+      "max_per_minute" : 0,
+      "enrich_function" : "function (match, axios) { return axios.get(\"http://\" + match + \".edns.ip-api.com/json\") }",
+      "for_each_result" : "function (value, input, enrich) {\n  return input + \" -> \" + value.dns.ip + \", \" + value.dns.geo;\n}",
+      "accepted_patterns" : [
+         "59778b4a65e3b0000fb5d6c4"
+      ],
+      "testresult" : "www.google.com -> 173.194.97.8, United States - Google\ndosomething.com -> 173.194.97.9, United States - Google",
+      "batch_size" : 0,
+      "batchable" : false,
+      "cacheable" : true,
+      "name" : "DNS Lookup",
+      "description" : "Uses the ip-api.com API to lookup a resolve a Domain Name",
+      "id" : "597f1f06a4157e000f6615cb"
+   }
+]

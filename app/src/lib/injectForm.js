@@ -7,6 +7,8 @@ let setValue = function (el, val) {
     for (let i = 0; i < el.options.length; i += 1) {
       el.options[i].selected = val.indexOf(el.options[i].value) >= 0
     }
+  } else if (el.type === 'checkbox' && val) {
+    el.checked = 'checked'
   } else {
     el.value = val
   }

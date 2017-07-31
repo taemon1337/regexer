@@ -35,6 +35,8 @@
             <dl>
               <dd><strong>Enrich:</strong></dd>
               <dt><pre>{{ enrich.enrich_function }}</pre></dt>
+              <dd><strong>Accepted Patterns:</strong></dd>
+              <dt><pre>{{ patternNames(enrich) }}</pre></dt>
               <dd><strong>Examples:</strong></dd>
               <dt><pre>{{ enrich.testresult }}</pre></dt>
             </dl>
@@ -53,7 +55,7 @@
 
 <script>
   import { mapGetters } from 'vuex'
-  import { EnrichTypes } from '@/store/mutation-types'
+  import { EnrichTypes, PatternTypes } from '@/store/mutation-types'
 
   export default {
     name: 'ListEnrichs',
@@ -65,7 +67,8 @@
     computed: {
       ...mapGetters({
         enrichs: EnrichTypes.fetch,
-        selected: EnrichTypes.selected
+        selected: EnrichTypes.selected,
+        patterns: PatternTypes.fetch
       })
     },
     methods: {
@@ -80,6 +83,9 @@
       },
       edit (enrich) {
         this.$store.dispatch(EnrichTypes.edit, enrich)
+      },
+      patternNames (enrich) {
+        return this.patterns.filter(function (p) { return enrich.accepted_patterns.indexOf(p.id) >= 0 }).map(function (p) { return p.name }).join(', ')
       }
     },
     created () {

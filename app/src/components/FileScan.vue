@@ -94,7 +94,7 @@
     name: 'FileScan',
     props: {
       file: {
-        type: File,
+        type: [File, Blob],
         required: true
       },
       combine: {
@@ -216,13 +216,14 @@
         self.enriching = true
         self.progress = 0
         Promise.all(self.enrichs.map(function (enrich) {
-          let compatibles = self.patterns.filter(function (p) { return enrich.accepted_patterns.indexOf(p.id) })
+          let compatibles = self.patterns.filter(function (p) { return enrich.accepted_patterns.indexOf(p.id) >= 0 })
 
           return Promise.all(compatibles.map(function (pattern) {
             total += 1
             self.progress = Math.floor(count / total * 100)
-            let key = [pattern.name, enrich.name].join(' - ')
-            return Enricher(self.results[pattern.name], enrich).then(function (resp) {
+            let key = [enrich.name, pattern.name].join(' - ')
+            let all = self.results[pattern.name]
+            return Enricher(all, enrich).then(function (resp) {
               self.results[key] = resp
               count += 1
               self.progress = Math.floor(count / total * 100)

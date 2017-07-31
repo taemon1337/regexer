@@ -37,7 +37,7 @@
             </div>
             <div class="column">
               <label class="checkbox">
-                <input name="batchable" type="checkbox" value="1" checked>
+                <input name="batchable" type="checkbox" value="1" :checked='current.batchable'>
                 Enable Batch Processing
               </label>
               <div class="notification thin">
@@ -66,7 +66,7 @@
               <div class="field">
                 <label class="label">Expected Parsed Result</label>
                 <div class="control">
-                  <textarea rows='4' name="testresult" class="textarea" placeholder="what the regex should produce from evaluating each line..."></textarea>
+                  <textarea ref='testresult' rows='4' name="testresult" class="textarea" placeholder="what the regex should produce from evaluating each line..."></textarea>
                 </div>
               </div>
             </div>
@@ -111,20 +111,10 @@
               </div>
             </div>
 
-            <div class="column is-half">
-              <div class="field">
-                <label class="label">Parsed Test Result</label>
-                <div class="control">
-                  <data-result :result="result"></data-result>
-                </div>
-              </div>
-            </div>
-            <div class="column is-half">
-              <div class="field">
-                <label class="label">Extracted Test Result</label>
-                <div class="control">
-                  <data-result :result="result.join('\n')"></data-result>
-                </div>
+            <div class="field column is-12">
+              <label class="label">Test Result</label>
+              <div class="control">
+                <pre>{{ result.join('\n') }}</pre>
               </div>
             </div>
           </div>
@@ -160,7 +150,20 @@
                 </div>
               </div>
             </div>
-            
+
+            <div class="field">
+              <label class="label">
+                Post Processing
+                <span v-if="!postprocess.error" class="icon has-text-success"><span class="fa fa-check"></span></span>
+                <span v-else class="icon has-text-danger"><span class="fa fa-remove"></span></span>
+              </label>
+              <small>Custom processing function for each parsed value</small>
+              <div class="control">
+                <textarea @change="validatePostprocess" name="for_each_result" class="textarea" :placeholder="postprocess.default_postprocess">{{ postprocess.default_postprocess }}</textarea>
+                <span v-if="postprocess.error" class="has-text-danger">{{ postprocess.error }}</span>
+              </div>
+            </div>
+
             <strong>Example Functions</strong>
             <pre style="white-space: pre-wrap;padding:7px;">{{ examples.join('\n') }}</pre>
           </div>
@@ -170,6 +173,7 @@
           <button @click.prevent="save" :disabled='!passedtest' type="button" class="button is-primary">Save</button>
           <button :disabled='!cantest' type="button" @click='test' class="button is-primary">Test</button>
           <button @click='close' class="button">Cancel</button>
+          <button type="button" @click='forcePass' class="button is-warning">Force Pass</button>
           <div class="is-pulled-right" style="float:right;">
             <button v-if="current && current.id" @click='remove' class="button" title="Delete">
               <span class="icon has-text-danger">
@@ -203,6 +207,10 @@
         enrichfn: {
           error: null,
           default_enrich: 'function (match, axios) { return match }'
+        },
+        postprocess: {
+          error: null,
+          default_postprocess: 'function (value, input, enrich) { return value; }'
         },
         advanced: false,
         examples: [
@@ -282,6 +290,10 @@
         this.validateFunction('enrichfn', e)
         this.docantest()
       },
+      validatePostprocess: function (e) {
+        this.validateFunction('postprocess', e)
+        this.docantest()
+      },
       selectPatternsChanged (e) {
         let formdata = serializeForm(this.$refs.form)
         this.setTestData(formdata)
@@ -294,11 +306,15 @@
           }
         })
         this.testData = td.join('\n')
+      },
+      forcePass () {
+        this.$refs.testresult.value = this.result.join('\n')
+        this.passedtest = true
       }
     },
     created () {
       if (this.current) {
-        if (this.current.enrich_function) {
+        if (this.current.for_each_result) {
           this.advanced = true
         }
       }
