@@ -37,11 +37,18 @@
             </div>
             <div class="column">
               <label class="checkbox">
-                <input name="batchable" type="checkbox" value="1" :checked='current.batchable'>
+                <input name="batchable" type="checkbox" value="1">
                 Enable Batch Processing
               </label>
               <div class="notification thin">
                 Enabling batch processing will provide an array of matches to the enrich function instead of a single.
+              </div>
+              <label class="checkbox">
+                <input name="proxyable" type="checkbox" value="1">
+                Proxy request
+              </label>
+              <div class="notification thin">
+                Using the proxy will eliminate the need for Cross Origin Resource Sharing (CORS) support on the server.
               </div>
               <!--<label class="checkbox">-->
               <!--  <input name="cacheable" type="checkbox" value="1" checked>-->

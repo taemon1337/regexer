@@ -1,4 +1,3 @@
-import api from '@/api'
 import isArray from '@/lib/isArray'
 import Promisify from '@/lib/Promisify'
 
@@ -15,7 +14,7 @@ let defaults = {
  *   batchHandler - a function to receive a batch of items to process which can return a promise or a value
  *   opts - { batchSize: 100, maxPerMinute: 150 } overrides
  */
-export default function Batcher (all, batchHandler, opts) {
+export default function Batcher (all, batchHandler, opts, httplib) {
   let batchSize = opts.batchSize > 0 ? opts.batchSize : defaults.batchSize
   let maxPerMinute = opts.maxPerMinute > 0 ? opts.maxPerMinute : defaults.maxPerMinute
   let promisify = Promisify(batchHandler)
@@ -28,7 +27,7 @@ export default function Batcher (all, batchHandler, opts) {
       let next = function (batch) {
         index += batchSize
 
-        let result = promisify(batch, api.proxy) // result will be a promise
+        let result = promisify(batch, httplib) // result will be a promise
         result.then(function (batchResults) {
           results = results.concat(batchResults)
 

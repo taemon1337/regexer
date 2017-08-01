@@ -3,6 +3,7 @@
     <label class="label">
       {{ name }}
       <span class="tag is-success">{{ computedMatches.length }}</span>
+      <span @click="clone" class="icon" title="Copy to new dataset"><i class="fa fa-clone"></i></span>
     </label>
     <data-result textarea :result="computedMatches"></data-result>
   </section>
@@ -10,6 +11,7 @@
 
 <script>
   import DataResult from '@/components/DataResult'
+  import { DatasetTypes } from '@/store/mutation-types'
 
   export default {
     name: 'FileScanResultBox',
@@ -29,6 +31,13 @@
     },
     data () {
       return {}
+    },
+    methods: {
+      clone () {
+        let blob = new Blob(this.matches, { type: 'text/plain' })
+        blob.name = 'New ' + this.name
+        this.$store.dispatch(DatasetTypes.add, blob)
+      }
     },
     computed: {
       computedMatches () {

@@ -25,6 +25,10 @@
       <div :class="fullscreen ? 'column is-12' : 'column is-half'" style="max-width:100%;">
         <h1 class="title">Scan files to selected patterns</h1>
         <new-scan-form></new-scan-form>
+        <br>
+        <div v-for="(dataset, index) in datasets" key="index" class="box">
+          <dataset-scan :dataset='dataset'></dataset-scan>
+        </div>
       </div>
       <div v-if="!fullscreen" class="column is-half">
         <h1 class="title">Available Patterns</h1>
@@ -46,7 +50,8 @@
   import NewScanForm from '@/components/NewScanForm'
   import ListPatterns from '@/components/ListPatterns'
   import ListEnrichs from '@/components/ListEnrichs'
-  import { PatternTypes, EnrichTypes, GlobalTypes } from '@/store/mutation-types'
+  import DatasetScan from '@/components/DatasetScan'
+  import { PatternTypes, EnrichTypes, GlobalTypes, DatasetTypes } from '@/store/mutation-types'
   import { mapGetters } from 'vuex'
 
   export default {
@@ -56,7 +61,8 @@
     },
     computed: {
       ...mapGetters({
-        fullscreen: GlobalTypes.fullscreen
+        fullscreen: GlobalTypes.fullscreen,
+        datasets: DatasetTypes.all
       })
     },
     methods: {
@@ -70,7 +76,8 @@
     components: {
       NewScanForm,
       ListPatterns,
-      ListEnrichs
+      ListEnrichs,
+      DatasetScan
     }
   }
 </script>

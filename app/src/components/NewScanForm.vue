@@ -21,38 +21,32 @@
         </div>
       </div>
     </form>
-    
-    <div v-for="(file, index) in selected" key="index" class="box">
-      <file-scan :file='file'></file-scan>
-    </div>
   </div>
 </template>
 
 <script>
-  import FileScan from '@/components/FileScan'
+  import { DatasetTypes } from '@/store/mutation-types'
 
   export default {
     name: 'NewScanForm',
     data () {
-      return {
-        selected: []
-      }
+      return {}
     },
     methods: {
       openDialog () {
         this.$refs.fileInput.click()
       },
       fileSelected (e) {
-        this.selected = e.target.files
+        for (let i = 0; i < e.target.files.length; i += 1) {
+          this.$store.dispatch(DatasetTypes.add, e.target.files[i])
+        }
       },
       textSelected (e) {
         let blob = new Blob([e.target.value], { type: 'text/plain' })
-        this.selected.push(blob)
+        blob.name = 'New Data ' + Math.random().toString().replace('.', '').slice(0, 6)
+        this.$store.dispatch(DatasetTypes.add, blob)
         e.target.value = ''
       }
-    },
-    components: {
-      FileScan
     }
   }
 </script>

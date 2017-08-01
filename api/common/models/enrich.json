@@ -22,6 +22,10 @@
       "type": "boolean",
       "default": true
     },
+    "proxyable": {
+      "type": "boolean",
+      "default": true
+    },
     "accepted_patterns": {
       "type": "array",
       "default": []

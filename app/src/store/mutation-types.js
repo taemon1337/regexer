@@ -31,3 +31,9 @@ export const GlobalTypes = {
   fullscreen: 'Global.fullscreen',
   filter: 'Global.filter'
 }
+
+export const DatasetTypes = {
+  all: 'Dataset.all',
+  add: 'Dataset.add',
+  remove: 'Dataset.remove'
+}

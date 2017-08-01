@@ -5,6 +5,7 @@ var server = require('http').createServer()
   , port = process.env.PORT || 8080
   , env = process.env.ENV || 'prod'
   , API = process.env.API || 'http://api:8080'
+  , WOT_KEY = process.env.WOT_KEY || false
   ;
 
 app.use(express.static('web'));
@@ -14,15 +15,20 @@ app.all('/api*', function(req, res) {
 });
 
 app.all('/proxy/*', function (req, res) {
-  try {
-    var url = req.originalUrl.toString().split('proxy/').pop();
-    console.log('PROXY -> ' + url)
-    return req.pipe(request(url)).pipe(res);
-  } catch (err) {
-    console.warn('Error in Proxy: ', err)
-    req.sendStatus(400)
-  }
+  var url = req.originalUrl.toString().split('proxy/').pop();
+  console.log('PROXY -> ' + url);
+  req.pipe(request(url)).pipe(res);
 })
+
+if (WOT_KEY) {
+  console.log('Web of Trust Proxy Enabled.');
+  app.all('/wot', function (req, res) {
+    var path = req.originalUrl.indexOf('?') >= 0 ? '?' + req.originalUrl.split('?').pop() + '&key=' + WOT_KEY : '?key=' + WOT_KEY;
+    var url = 'http://api.mywot.com/0.4/public_link_json2';
+    console.log('WOT -> ' + url, path);
+    req.pipe(request(url + path)).pipe(res);
+  })
+}
 
 server.on('request', app);
 server.listen(port, function() { console.log('Listening on ' + server.address().port) });

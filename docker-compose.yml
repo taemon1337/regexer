@@ -16,6 +16,8 @@ services:
     build: 
       context: ./app
       dockerfile: Dockerfile.production
+    environment:
+      - WOT_KEY=$WOT_KEY
     volumes:
       - ./app:/app
     working_dir: /app

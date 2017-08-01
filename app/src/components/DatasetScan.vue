@@ -9,15 +9,21 @@
       </div>
       <div class="media-content">
         <div v-if="error" class='notification is-danger'>{{ error }}</div>
-        <strong>{{ file.name }}</strong>
-        <small>({{ formatBytes(file.size) }})</small>
-        <small>({{ file.type }})</small>
+        <strong>{{ dataset.name }}</strong>
+        <small>({{ formatBytes(dataset.size) }})</small>
+        <small>({{ dataset.type }})</small>
         <div class="media">
           <div class="media-content">
             <button v-if="!running" @click='start' class="button is-primary" type="button">Scan</button>
+            <button v-if="count > 0" class="button is-primary" @click='startEnriching' title="Start selected enrichments">Enrich</button>
             <button v-if="running" @click='stop' class="button is-danger" type="button">Stop</button>
             <div class="is-pulled-right">
-              <button v-if="count > 0" class="button is-primary" @click='saveToDisk' title="Download Output">Download</button>
+              <button v-if="count > 0" class="button is-primary" @click='saveToDisk' title="Download Output">
+                <span class="icon"><i class="fa fa-download"></i></span>
+              </button>
+              <button class="button is-danger" @click='removeDataset' title="Delete Dataset">
+                <span class="icon"><i class="fa fa-trash"></i></span>
+              </button>
             </div>
           </div>
         </div>
@@ -79,7 +85,7 @@
 </template>
 
 <script>
-  import { PatternTypes, EnrichTypes, GlobalTypes } from '@/store/mutation-types'
+  import { PatternTypes, EnrichTypes, GlobalTypes, DatasetTypes } from '@/store/mutation-types'
   import { mapGetters } from 'vuex'
   import LineReader from '@/lib/LineReader'
   import bytesToSize from '@/lib/bytesToSize'
@@ -91,9 +97,9 @@
   import FileScanResultBox from '@/components/FileScanResultBox'
 
   export default {
-    name: 'FileScan',
+    name: 'DatasetScan',
     props: {
-      file: {
+      dataset: {
         type: [File, Blob],
         required: true
       },
@@ -127,9 +133,9 @@
     },
     methods: {
       saveToDisk () {
-        let filename = this.file.name + '.out.json'
+        let filename = this.datset.name + '.out.json'
         let data = {
-          file: { name: this.file.name, size: this.file.size, readableSize: bytesToSize(this.file.size), type: this.file.type },
+          dataset: { name: this.dataset.name, size: this.dataset.size, readableSize: bytesToSize(this.dataset.size), type: this.dataset.type },
           filter: this.filter,
           progress: this.progress + '%',
           total: this.count,
@@ -165,7 +171,7 @@
         self.running = true
         self.results = {}
         self.headers = []
-        let file = this.file
+        let file = this.dataset
         let reader = LineReader({ chunkSize: 10240 })
         let regexs = {}
         let patterns = {}
@@ -202,9 +208,6 @@
         reader.on('end', function () {
           self.progress = 100
           self.running = false
-          setTimeout(function () {
-            self.startEnriching()
-          }, 1000)
         })
 
         reader.read(file)
@@ -257,6 +260,12 @@
       clearFilter () {
         this.filter = null
         this.$refs.filterInput.value = ''
+      },
+      removeDataset () {
+        let a = confirm('Are you sure you want to remove ' + this.dataset.name + '?')
+        if (a) {
+          this.$store.dispatch(DatasetTypes.remove, this.dataset)
+        }
       }
     },
     components: {

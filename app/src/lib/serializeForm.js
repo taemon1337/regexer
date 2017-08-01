@@ -16,9 +16,7 @@ export default function serializeForm (form) {
     }
     if (valueTypes.indexOf(el.nodeName) >= 0) {
       if (booleanTypes.indexOf(el.type) >= 0) {
-        if (el.checked) {
-          obj[el.name] = el.value
-        }
+        obj[el.name] = el.checked
       } else {
         obj[el.name] = el.value
       }

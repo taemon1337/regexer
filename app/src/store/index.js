@@ -5,6 +5,7 @@ import * as getters from './getters'
 import messages from './modules/messages'
 import patterns from './modules/patterns'
 import enrichs from './modules/enrichs'
+import datasets from './modules/datasets'
 import global from './modules/global'
 
 Vue.use(Vuex)
@@ -18,6 +19,7 @@ export default new Vuex.Store({
     messages,
     patterns,
     enrichs,
+    datasets,
     global
   },
   strict: debug

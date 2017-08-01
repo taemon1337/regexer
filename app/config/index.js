@@ -35,6 +35,10 @@ module.exports = {
       '/proxy': {
         target: 'http://proxy:8080',
         changeOrigin: true
+      },
+      '/wot': {
+        target: 'http://proxy:8080',
+        changeOrigin: true
       }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
