@@ -34,7 +34,8 @@
     },
     methods: {
       clone () {
-        let blob = new Blob(this.matches, { type: 'text/plain' })
+        console.log(this.computedMatches)
+        let blob = new Blob(this.computedMatches, { type: 'text/plain' })
         blob.name = 'New ' + this.name
         this.$store.dispatch(DatasetTypes.add, blob)
       }

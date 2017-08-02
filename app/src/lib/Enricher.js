@@ -41,7 +41,9 @@ export default function Enricher (all, enrich) {
         return promisify(item, httphandler).then(function (val) {
           return postProcess(val, item, enrich)
         })
-      }))
+      })).then(function (results) {
+        return results.filter(function (result) { return !!result })
+      })
     }
   } else {
     throw new Error('Invalid Enrich Function!' + enrich.enrich_function)

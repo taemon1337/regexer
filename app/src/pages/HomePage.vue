@@ -9,7 +9,8 @@
                 Pattern Matcher
               </h1>
               <h2 class="subtitle">
-                Scan files for matching text patterns!
+                Scan files for matching text patterns!<br>
+                Enrich matched patterns using custom scripts!
               </h2>
             </div>
             <div class="column">
@@ -23,7 +24,7 @@
     </section>
     <section class="columns">
       <div :class="fullscreen ? 'column is-12' : 'column is-half'" style="max-width:100%;">
-        <h1 class="title">Scan files to selected patterns</h1>
+        <h1 class="title">Select files or Paste data to get started...</h1>
         <new-scan-form></new-scan-form>
         <br>
         <div v-for="(dataset, index) in datasets" key="index" class="box">
@@ -35,7 +36,7 @@
         <list-patterns></list-patterns>
         <hr>
         <div class="is-pulled-right">
-          <button class="button" @click="createEnrich">
+          <button class="button is-primary" @click="createEnrich">
             Create Enrichment
           </button>
         </div>

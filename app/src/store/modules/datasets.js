@@ -22,11 +22,12 @@ const actions = {
 // mutations must be synchronous
 const mutations = {
   [DatasetTypes.add] (state, dataset) {
+    dataset.id = Math.random().toString().replace('.', '')
     state.all.push(dataset)
   },
   [DatasetTypes.remove] (state, dataset) {
     state.all.forEach(function (d, i) {
-      if (d.name === dataset.name) {
+      if (d.id === dataset.id) {
         state.all.splice(i, 1)
       }
     })

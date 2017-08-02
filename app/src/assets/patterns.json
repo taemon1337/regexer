@@ -1,66 +1,74 @@
 [
    {
-      "regex_string" : "([a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\\.[a-zA-Z]{2,})+)",
-      "id" : "5978a00ad6c30e0010b3824b",
-      "testdata" : "www.google.com\nhttp://dosomething.com/whatever\nhttps://it.sc.it",
       "description" : "Domain name (without the http(s):// and without any path.",
-      "testresult" : "www.google.com\ndosomething.com",
-      "name" : "Domain Name"
+      "testdata" : "www.google.com\nhttp://dosomething.com/whatever\nhttps://it.sc.it",
+      "name" : "Domain Name",
+      "regex_sha256" : "6fa4cc12d125d52238cece0a4f977fdeeafd21ddcbef169dc0b0de405f29eaa9",
+      "regex_string" : "([a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\\.[a-zA-Z]{2,})+)",
+      "id" : "59778b4a65e3b0000fb5d6c4",
+      "testresult" : "www.google.com\ndosomething.com"
    },
    {
-      "name" : "IPv4 Address",
-      "testresult" : "1.2.3.4\n1.0.0.0\n255.255.255.255\n1.1.1.1",
       "testdata" : "1.2.3.4\n100.200.300.400\n1.0.0.0\n255.255.255.255\n1.1.1.1\n",
       "description" : "Internet Protocol Version 4 address regular expression.",
-      "id" : "5978a00bd6c30e0010b3824c",
-      "regex_string" : "((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))"
+      "name" : "IPv4 Address",
+      "regex_sha256" : "15a1d33922283851259f548c1145c3d5bbf4b2febe987f92193eb41a21fffaa1",
+      "regex_string" : "((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))",
+      "id" : "59778b4a65e3b0000fb5d6c5",
+      "testresult" : "1.2.3.4\n1.0.0.0\n255.255.255.255\n1.1.1.1"
    },
    {
-      "testdata" : "AA:BB:CC:DD:EE:FF\nA:B:C:D:E:F\nA:B:C:D:E:F:G\nAA:BB:CC:DD:EE:FF:GG",
       "description" : "A simple MAC address regex in colon separator form",
+      "testdata" : "AA:BB:CC:DD:EE:FF\nA:B:C:D:E:F\nA:B:C:D:E:F:G\nAA:BB:CC:DD:EE:FF:GG",
       "name" : "MAC Address",
-      "testresult" : "AA:BB:CC:DD:EE:FF\nAA:BB:CC:DD:EE:FF",
+      "regex_sha256" : "14563caeb11b3561603278d480aa099f5ff91bb944072feb652f66430e624a5f",
       "regex_string" : "(([A-Fa-f0-9]{2}[:]){5}[A-Fa-f0-9]{2}[,]?)+",
-      "id" : "5978a00bd6c30e0010b3824d"
+      "id" : "59778b4a65e3b0000fb5d6c6",
+      "testresult" : "AA:BB:CC:DD:EE:FF\nAA:BB:CC:DD:EE:FF"
    },
    {
-      "id" : "5978a00bd6c30e0010b3824e",
-      "regex_string" : "([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\\.[a-zA-Z0-9._-]+)",
-      "testresult" : "test@gmail.com\njon.smith@foo.bar.com",
       "name" : "Email Address",
+      "regex_sha256" : "95b80b08584783c24aa864b683626b2a4d27e29858ac03c34ca80aa149aa52c7",
       "description" : "Email address regex",
-      "testdata" : "test@gmail.com\n1.email.com\n1@@gamil.com\n1@gcom\njon.smith@foo.bar.com"
+      "testdata" : "test@gmail.com\n1.email.com\n1@@gamil.com\n1@gcom\njon.smith@foo.bar.com",
+      "testresult" : "test@gmail.com\njon.smith@foo.bar.com",
+      "id" : "59778b4a65e3b0000fb5d6c7",
+      "regex_string" : "([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\\.[a-zA-Z0-9._-]+)"
    },
    {
-      "regex_string" : "(https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*))",
-      "id" : "5978a00bd6c30e0010b3824f",
-      "testdata" : "https://www.google.com/search\nhttp://foo.bar.com/a/path/to/something",
+      "name" : "FQDN",
+      "regex_sha256" : "12e20b5cd31719550375efb9da8aae95d70b66057c688a7d6fedf315f13abfae",
       "description" : "Fully qualified domain names including http:// and paths.",
+      "testdata" : "https://www.google.com/search\nhttp://foo.bar.com/a/path/to/something",
       "testresult" : "https://www.google.com/search\nhttp://foo.bar.com/a/path/to/something",
-      "name" : "FQDN"
+      "id" : "59778b4a65e3b0000fb5d6c8",
+      "regex_string" : "(https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*))"
    },
    {
-      "name" : "Telephone Number",
+      "id" : "59778b4a65e3b0000fb5d6c9",
       "testresult" : "(123) 456-7890\n123-456-7890\n123.456.7890\n1234567890\n+31636363634\n075-63546725",
-      "testdata" : "(123) 456-7890\n123-456-7890\n123.456.7890\n1234567890\n+31636363634\n075-63546725",
+      "regex_string" : "([\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6})",
       "description" : "Generic telephone number regex.",
-      "id" : "5978a00bd6c30e0010b38250",
-      "regex_string" : "([\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6})"
+      "testdata" : "(123) 456-7890\n123-456-7890\n123.456.7890\n1234567890\n+31636363634\n075-63546725",
+      "name" : "Telephone Number",
+      "regex_sha256" : "101a7b2ce9b0872468d2852e02e9669ff752a4f8c6923db721323c35190af7e5"
    },
    {
       "name" : "US Telephone Number",
-      "testresult" : "(123) 456-7890\n123-456-7890",
-      "testdata" : "(123) 456-7890\n123-456-7890\n123.456.7890\n1234567890\n+31636363634\n075-63546725",
+      "regex_sha256" : "8708aaa890ec85b28bdeb9f82d161462b0476f251a2f6940194a3f6550752f8b",
       "description" : "Common United States telephone number expression",
-      "id" : "5978a00bd6c30e0010b38251",
-      "regex_string" : "((\\()?\\d{3}(\\))?(-|\\s)?\\d{3}(-|\\s)\\d{4})"
+      "testdata" : "(123) 456-7890\n123-456-7890\n123.456.7890\n1234567890\n+31636363634\n075-63546725\n0123.456.78901\n 123.456.78901",
+      "regex_string" : "((\\()?\\d{3}(\\))?(-| |\\.)?\\d{3}(-| |\\.)\\d{4})\\b",
+      "testresult" : "(123) 456-7890\n123-456-7890\n123.456.7890",
+      "id" : "59778b4a65e3b0000fb5d6ca"
    },
    {
-      "id" : "5978a4e7d6c30e0010b38252",
-      "regex_string" : "([a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\\.(?:com|org|edu|gov|uk|net|ca|de|jp|fr|au|us|ru|ch|it|nl|se|no|es|mil|cn|br|in|biz|info|io|jobs|mobi|name|tel))",
       "name" : "Common Domain Name",
-      "testresult" : "something.com\nfoo.cn\nfoo.jp\nsomething.biz\nother.gov\nsomething.com",
+      "regex_sha256" : "e35ba17cb0465e33c5569f464be10afcd914843970255ffce7e2464998c00ea9",
       "description" : "These domains have the most frequently used top level domains, as in they end in .com, org, biz, gov, etc.",
-      "testdata" : "foo.bar\nsomething.com\nfoo.cn\nfoo.jp\nsomething.biz\nsomething.foo\nsomething.bak\nsomething.other.gov\ngov.other\nsomething.com.foo.bar"
+      "testdata" : "foo.bar\nsomething.com\nfoo.cn\nfoo.jp\nsomething.biz\nsomething.foo\nsomething.bak\nsomething.other.gov\ngov.other\nsomething.com.foo.bar",
+      "regex_string" : "([a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\\.(?:com|org|edu|gov|uk|net|ca|de|jp|fr|au|us|ru|ch|it|nl|se|no|es|mil|cn|br|in|biz|info|io|jobs|mobi|name|tel))",
+      "testresult" : "something.com\nfoo.cn\nfoo.jp\nsomething.biz\nother.gov\nsomething.com",
+      "id" : "598090827add96000f82e342"
    }
 ]

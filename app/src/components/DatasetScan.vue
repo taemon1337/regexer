@@ -55,9 +55,9 @@
         <div class="navbar-item">
           <div class="select">
             <select @change="setView">
-              <option value='list'>List View</option>
-              <option value='tabs'>Tabs View</option>
-              <option value='table'>Table View</option>
+              <option value='file-scan-result-boxs'>List View</option>
+              <option value='file-scan-result-tabs'>Tabs View</option>
+              <option value='file-scan-result-table'>Table View</option>
             </select>
           </div>
         </div>
@@ -69,17 +69,7 @@
           </button>
         </div>
       </nav>
-      <div v-if="view === 'list'">
-        <div v-for="(result, name) in results" key="name">
-          <file-scan-result-box :name='name' :matches='result' :filter='filter'></file-scan-result-box>
-        </div>
-      </div>
-      <div v-else-if="view === 'tabs'">
-        <file-scan-result-tabs :results='results' :filter='filter'></file-scan-result-tabs>
-      </div>
-      <div v-else>
-        <file-scan-result-table :results='results' :filter='filter'></file-scan-result-table>
-      </div>
+      <component :is='view' :results='results' :filter='filter'></component>
     </div>
   </div>
 </template>
@@ -94,7 +84,7 @@
   import Enricher from '@/lib/Enricher'
   import FileScanResultTable from '@/components/FileScanResultTable'
   import FileScanResultTabs from '@/components/FileScanResultTabs'
-  import FileScanResultBox from '@/components/FileScanResultBox'
+  import FileScanResultBoxs from '@/components/FileScanResultBoxs'
 
   export default {
     name: 'DatasetScan',
@@ -117,7 +107,7 @@
         progress: 0,
         enriching: false,
         error: null,
-        view: 'list',
+        view: 'file-scan-result-boxs',
         filter: null
       }
     },
@@ -133,7 +123,7 @@
     },
     methods: {
       saveToDisk () {
-        let filename = this.datset.name + '.out.json'
+        let filename = this.dataset.name + '.out.json'
         let data = {
           dataset: { name: this.dataset.name, size: this.dataset.size, readableSize: bytesToSize(this.dataset.size), type: this.dataset.type },
           filter: this.filter,
@@ -248,7 +238,6 @@
         return this.view === view ? 'button is-small is-primary' : 'button is-small'
       },
       setView (e) {
-        console.log('setting view...')
         this.view = e.target.value
       },
       toggleFullscreen () {
@@ -271,7 +260,7 @@
     components: {
       FileScanResultTable,
       FileScanResultTabs,
-      FileScanResultBox
+      FileScanResultBoxs
     }
   }
 </script>

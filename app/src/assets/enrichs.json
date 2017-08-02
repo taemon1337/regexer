@@ -1,51 +1,80 @@
 [
    {
-      "batch_size" : 0,
-      "enrich_function" : "function (matches, axios) { \n  var data = matches.map(function (m) { return { query: m }});\n  return axios.post(\"http://ip-api.com/batch\", data) \n}",
-      "batchable" : true,
-      "description" : "Geolocate IP address matches using the ip-api.com free service.",
-      "id" : "597b1ba168507b000fc3b991",
-      "name" : "IP Geolocation",
-      "testresult" : "1.2.3.4: Washington, Mukilteo, United States\n1.0.0.0: Queensland, South Brisbane, Australia\n255.255.255.255: reserved range\n1.1.1.1: Victoria, Research, Australia\n1.2.3.0: Washington, Mukilteo, United States\n10.20.30.0: private range",
-      "proxyable" : true,
-      "cacheable" : true,
+      "for_each_result" : "function (value, input, enrich) {\n  var out = input + \": \";\n  if (value.status === \"success\") {\n    out += [value.regionName, value.city, value.country].join(\", \")\n  } else {\n     out += value.message\n  }\n  return out;\n}",
       "accepted_patterns" : [
          "59778b4a65e3b0000fb5d6c5",
          "597b811e7fd61f000fda07fe"
       ],
-      "for_each_result" : "function (value, input, enrich) {\n  var out = input + \": \";\n  if (value.status === \"success\") {\n    out += [value.regionName, value.city, value.country].join(\", \")\n  } else {\n     out += value.message\n  }\n  return out;\n}",
-      "max_per_minute" : 0
-   },
-   {
-      "max_per_minute" : 0,
-      "for_each_result" : "function (value, input, enrich) {\n  return input + \" -> \" + value.dns.ip + \", \" + value.dns.geo;\n}",
-      "proxyable" : true,
-      "accepted_patterns" : [
-         "59778b4a65e3b0000fb5d6c4"
-      ],
-      "cacheable" : true,
-      "name" : "DNS Lookup",
-      "testresult" : "www.google.com -> 173.194.97.8, United States - Google\ndosomething.com -> 173.194.97.9, United States - Google",
-      "description" : "Uses the ip-api.com API to lookup a resolve a Domain Name",
-      "batchable" : false,
+      "id" : "597b1ba168507b000fc3b991",
       "batch_size" : 0,
-      "enrich_function" : "function (match, axios) { return axios.get(\"http://\" + match + \".edns.ip-api.com/json\") }",
-      "id" : "597f1f06a4157e000f6615cb"
-   },
-   {
-      "id" : "59806fcbc7a63600102fa23c",
-      "description" : "",
+      "cacheable" : true,
       "batchable" : true,
-      "enrich_function" : "function (matches, axios) {\n  return axios.get('/wot?hosts=' + matches.join(\"/\"));\n}",
+      "name" : "IP Geolocation",
+      "testresult" : "1.2.3.4: Washington, Mukilteo, United States\n1.0.0.0: Queensland, South Brisbane, Australia\n255.255.255.255: reserved range\n1.1.1.1: Victoria, Research, Australia\n1.2.3.0: Washington, Mukilteo, United States\n10.20.30.0: private range",
+      "description" : "Geolocate IP address matches using the ip-api.com free service.",
+      "proxyable" : true,
+      "enrich_function" : "function (matches, axios) { \n  var data = matches.map(function (m) { return { query: m }});\n  return axios.post(\"http://ip-api.com/batch\", data) \n}",
+      "max_per_minute" : 0
+   },
+   {
+      "enrich_function" : "function (match, axios) { return axios.get(\"http://\" + match + \".edns.ip-api.com/json\") }",
+      "max_per_minute" : 0,
+      "testresult" : "www.google.com -> 74.125.75.9, United States - Google\ndosomething.com -> 173.194.97.7, United States - Google\nsomething.com -> 74.125.75.89, United States - Google\nfoo.cn -> 173.194.97.6, United States - Google\nfoo.jp -> 173.194.97.9, United States - Google\nsomething.biz -> 74.125.75.14, United States - Google\nother.gov -> 173.194.97.10, United States - Google\nsomething.com -> 74.125.75.76, United States - Google",
+      "description" : "Uses the ip-api.com API to lookup a resolve a Domain Name",
+      "proxyable" : true,
+      "id" : "597f1f06a4157e000f6615cb",
       "batch_size" : 0,
-      "testresult" : "google.com: Online tracking 47%, Other 5%, Good site 99%",
-      "name" : "Web of Trust Reputation",
+      "cacheable" : true,
+      "batchable" : false,
+      "name" : "DNS Lookup",
+      "for_each_result" : "function (value, input, enrich) {\n  return input + \" -> \" + value.dns.ip + \", \" + value.dns.geo;\n}",
       "accepted_patterns" : [
-         "59778b4a65e3b0000fb5d6c4"
+         "59778b4a65e3b0000fb5d6c4",
+         "598090827add96000f82e342"
+      ]
+   },
+   {
+      "for_each_result" : "function (value, input, enrich) {\n  var dict = {\n    '101': 'Malware of viruses',\n    '102': 'Poor customer experience',\n    '103': 'Phishing',\n    '104': 'Scam',\n    '105': 'Potentially Illegal',\n    '201': 'Misleading claims or unethical',\n    '202': 'Privacy Risks',\n    '203': 'Suspicious',\n    '204': 'Hate, discrimination',\n    '205': 'Spam',\n    '206': 'Potentially unwanted programs',\n    '207': 'Ads/pop-ups',\n    '301': 'Online tracking',\n    '302': 'Alternative or controversial medicine',\n    '303': 'Opinions, religion, or politics',\n    '304': 'Other',\n    '401': 'Adult content',\n    '402': 'Incidental nudity',\n    '403': 'Gruesome or shocking',\n    '404': 'Site for kids',\n    '501': 'Good site'\n  }\n\n  if (value[input]) {\n    var out = [];\n    for (var key in value[input].categories) {\n      out.push(dict[key] + ' ' + value[input].categories[key] + '%');\n    }\n    return value[input].target + ': ' + out.join(', ');\n  } else {\n    return 'None';\n  }\n}",
+      "accepted_patterns" : [
+         "59778b4a65e3b0000fb5d6c4",
+         "598090827add96000f82e342"
+      ],
+      "id" : "59806fcbc7a63600102fa23c",
+      "cacheable" : true,
+      "batch_size" : 0,
+      "batchable" : true,
+      "name" : "Web of Trust Reputation",
+      "testresult" : "google.com: Online tracking 47%, Other 5%, Good site 99%",
+      "description" : "Web of Trust reputation is a open domain reputation platform for rating domain's trustworthiness.",
+      "proxyable" : false,
+      "enrich_function" : "function (matches, axios) {\n  return axios.get('/wot?hosts=' + matches.join(\"/\"));\n}",
+      "max_per_minute" : 0
+   },
+   {
+      "accepted_patterns" : [
+         "59778b4a65e3b0000fb5d6c5",
+         "597b811e7fd61f000fda07fe"
       ],
       "cacheable" : true,
+      "name" : "Public IPv4 Filter",
+      "batchable" : false,
+      "id" : "5980d023b37095000ff77774",
       "proxyable" : false,
-      "for_each_result" : "function (value, input, enrich) {\n  var dict = {\n    '101': 'Malware of viruses',\n    '102': 'Poor customer experience',\n    '103': 'Phishing',\n    '104': 'Scam',\n    '105': 'Potentially Illegal',\n    '201': 'Misleading claims or unethical',\n    '202': 'Privacy Risks',\n    '203': 'Suspicious',\n    '204': 'Hate, discrimination',\n    '205': 'Spam',\n    '206': 'Potentially unwanted programs',\n    '207': 'Ads/pop-ups',\n    '301': 'Online tracking',\n    '302': 'Alternative or controversial medicine',\n    '303': 'Opinions, religion, or politics',\n    '304': 'Other',\n    '401': 'Adult content',\n    '402': 'Incidental nudity',\n    '403': 'Gruesome or shocking',\n    '404': 'Site for kids',\n    '501': 'Good site'\n  }\n\n  if (value[input]) {\n    var out = [];\n    for (var key in value[input].categories) {\n      out.push(dict[key] + ' ' + value[input].categories[key] + '%');\n    }\n    return value[input].target + ': ' + out.join(', ');\n  } else {\n    return 'None';\n  }\n}",
-      "max_per_minute" : 0
+      "testresult" : "1.2.3.4\n1.0.0.0\n255.255.255.255\n1.1.1.1\n1.2.3.0",
+      "description" : "",
+      "enrich_function" : "function (match, axios) {\n  var isprivate = false;\n  if (match.startsWith('10.')) { isprivate = true }\n  if (match.startsWith('192.168.')) { isprivate = true }\n  if (match.match(/^172\\.(?:(?:1[6-9])|(?:2\\d)|(?:3[01]))\\.\\d+\\.\\d+/)) { isprivate = true }\n  if (!isprivate) { return match }\n}"
+   },
+   {
+      "accepted_patterns" : [
+         "59778b4a65e3b0000fb5d6c5"
+      ],
+      "cacheable" : true,
+      "batchable" : false,
+      "name" : "Network Address Filter",
+      "id" : "5981c8e5b37095000ff77775",
+      "proxyable" : false,
+      "testresult" : "1.2.3.0\n1.0.0.0\n255.255.255.0\n1.1.1.0",
+      "description" : "Convert all IPv4 Addresses into their Class C /24 network addresses.  This can be useful if you have many IP addresses that differ slightly and want to group them into a generic network address.",
+      "enrich_function" : "function (match, axios) { return match.split('.').slice(0,3).concat(['0']).join('.') }"
    }
 ]

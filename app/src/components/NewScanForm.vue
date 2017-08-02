@@ -8,6 +8,7 @@
             <input @change="fileSelected" class="is-hidden" type="file" ref="fileInput" multiple>
             <div class="control">
               <input @click="openDialog" class="input" type="text" placeholder="Select files...">
+              <small>Files are processed in browser and <strong>not</strong> uploaded</small>
             </div>
           </div>
         </div>

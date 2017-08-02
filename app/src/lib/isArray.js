@@ -1,3 +1,3 @@
 export default function (obj) {
-  return obj.forEach && typeof obj.forEach === 'function'
+  return obj && obj.forEach && typeof obj.forEach === 'function'
 }
