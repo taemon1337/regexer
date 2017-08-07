@@ -1,7 +1,8 @@
 import axios from 'axios'
 
-let defaultPatterns = require('@/assets/patterns.json')
-let defaultEnrichs = require('@/assets/enrichs.json')
+let removeIds = function (record) { return Object.assign({}, record, { id: undefined }) }
+let defaultPatterns = require('@/assets/patterns.json').map(removeIds)
+let defaultEnrichs = require('@/assets/enrichs.json').map(removeIds)
 let base = '/api'
 
 let proxy = axios.create({

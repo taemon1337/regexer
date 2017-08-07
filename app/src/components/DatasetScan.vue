@@ -15,7 +15,7 @@
         <div class="media">
           <div class="media-content">
             <button v-if="!running" @click='start' class="button is-primary" type="button">Scan</button>
-            <button v-if="count > 0" class="button is-primary" @click='startEnriching' title="Start selected enrichments">Enrich</button>
+            <button v-if="count > 0" :disabled='!enrichs.length' class="button is-primary" @click='startEnriching' title="Start selected enrichments">Enrich</button>
             <button v-if="running" @click='stop' class="button is-danger" type="button">Stop</button>
             <div class="is-pulled-right">
               <button v-if="count > 0" class="button is-primary" @click='saveToDisk' title="Download Output">
