@@ -1,6 +1,6 @@
 FROM node:alpine
 
-RUN npm install loopback
+RUN npm install --production loopback loopback-connector-mongodb
 
 WORKDIR /api
 

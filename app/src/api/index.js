@@ -32,7 +32,7 @@ let patterns = {
   },
   save: function (formdata) {
     if (formdata.id) {
-      return axios.put(base + '/patterns/' + formdata.id, formdata)
+      return axios.put(base + '/patterns/' + formdata.id, Object.assign({}, formdata, { id: undefined }))
     } else {
       return axios.post(base + '/patterns', formdata)
     }
@@ -59,7 +59,7 @@ let enrichs = {
   },
   save: function (formdata) {
     if (formdata.id) {
-      return axios.put(base + '/enrichs/' + formdata.id, formdata)
+      return axios.put(base + '/enrichs/' + formdata.id, Object.assign({}, formdata, { id: undefined }))
     } else {
       return axios.post(base + '/enrichs', formdata)
     }
